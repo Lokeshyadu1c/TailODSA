@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bubble Sort Visualization</title>
+    <style>
+        /* Main container for the whole page */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        /* Container for the bars */
+        #barWrapper {
+            border: 3px solid #333;
+            display: inline-block;
+            padding: 10px;
+            border-radius: 10px;
+            width: 400px;
+            height: 400px;
+        }
+
+        /* Container for the bars and their values */
+        #arrayContainer {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 300px;
+            gap: 10px;
+            margin-top: 50px;
+        }
+
+        /* Container for individual bars and their values */
+        .bar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Individual bars with transitions */
+        .bar {
+            width: 30px;
+            background-color: tomato;
+            transition: height 0.3s ease, background-color 0.3s ease;
+        }
+
+        /* Value below each bar */
+        .bar-value {
+            margin-top: 5px;
+            font-size: 16px;
+            color: black;
+        }
+
+        /* Highlight classes for visualization stages */
+        .bar-comparing {
+            background-color: orange;
+        }
+
+        .bar-swapped {
+            background-color: red;
+        }
+
+        .bar-sorted {
+            background-color: green;
+        }
+
+        /* Input field and sort button styling */
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div id="input">
+        <input type="text" id="arrayInput" placeholder="Enter numbers separated by commas">
+        <button onclick="sortArray()">Sort</button>
+    </div><br><br>
+
+    <!-- Wrapping the bar container inside a div with a border -->
+    <div id="barWrapper">
+        <div id="arrayContainer"></div>
+    </div>
+
+    <script>
+        // Function to start the sorting process
+        function sortArray() {
+            const arrayInput = document.getElementById('arrayInput').value;
+            const array = arrayInput.split(',').map(Number);
+
+            if (array.some(isNaN)) {
+                alert("Please enter a valid list of numbers separated by commas.");
+                return;
+            }
+
+            const arrayContainer = document.getElementById('arrayContainer');
+            arrayContainer.innerHTML = '';
+
+            // Find the maximum value in the array
+            const maxValue = Math.max(...array);
+            
+            // Scale factor to fit the bars within the height of the container
+            const scaleFactor = maxValue > 0 ? 300 / maxValue : 1; // max height of bars is 300px
+
+            // Create initial visualization with bars and numbers
+            const barElements = [];
+            for (let i = 0; i < array.length; i++) {
+                const barContainer = document.createElement('div');
+                barContainer.classList.add('bar-container');
+
+                const bar = document.createElement('div');
+                bar.style.height = (array[i] * scaleFactor) + 'px'; // Scale the height
+                bar.classList.add('bar');
+
+                const barValue = document.createElement('span');
+                barValue.classList.add('bar-value');
+                barValue.textContent = array[i]; // Display the number
+
+                barContainer.appendChild(bar);
+                barContainer.appendChild(barValue);
+                arrayContainer.appendChild(barContainer);
+
+                barElements.push({ bar, barValue }); // Save the reference to bars and values
+            }
+
+            let delay = 500; // Delay between each swap
+
+            // Bubble Sort implementation with delay for visualization
+            function bubbleSortStep(i, j) {
+                if (j < array.length - i - 1) {
+                    const bars = barElements.map(item => item.bar);
+                    const barValues = barElements.map(item => item.barValue);
+
+                    // Highlight bars as they are being compared
+                    bars[j].classList.add('bar-comparing');
+                    bars[j + 1].classList.add('bar-comparing');
+
+                    // Perform the swap if necessary
+                    if (array[j] > array[j + 1]) {
+                        // Swap elements in the array
+                        [array[j], array[j + 1]] = [array[j + 1], array[j]];
+
+                        // Update the heights of the bars and numbers
+                        bars[j].style.height = (array[j] * scaleFactor) + 'px';
+                        bars[j + 1].style.height = (array[j + 1] * scaleFactor) + 'px';
+
+                        barValues[j].textContent = array[j];
+                        barValues[j + 1].textContent = array[j + 1];
+
+                        // Highlight the swapped bars
+                        bars[j].classList.add('bar-swapped');
+                        bars[j + 1].classList.add('bar-swapped');
+
+                        // Wait for the swap animation to finish before continuing
+                        setTimeout(() => {
+                            bars[j].classList.remove('bar-comparing', 'bar-swapped');
+                            bars[j + 1].classList.remove('bar-comparing', 'bar-swapped');
+                        }, delay);
+                    } else {
+                        // Remove the comparing class if no swap is made
+                        setTimeout(() => {
+                            bars[j].classList.remove('bar-comparing');
+                            bars[j + 1].classList.remove('bar-comparing');
+                        }, delay);
+                    }
+
+                    // Recursively continue sorting
+                    setTimeout(() => bubbleSortStep(i, j + 1), delay);
+                } else if (i < array.length - 1) {
+                    // Move to the next iteration (outer loop)
+                    setTimeout(() => bubbleSortStep(i + 1, 0), delay);
+                } else {
+                    // Mark bars as sorted after the sort completes
+                    const bars = barElements.map(item => item.bar);
+                    bars.forEach(bar => bar.classList.add('bar-sorted'));
+                }
+            }
+
+            // Start the sorting process
+            bubbleSortStep(0, 0);
+        
+        }
+        
+    </script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Divide and Conquer Overview</title>
+    <style>
+        /* General Styling */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, white, rgb(78, 28, 28));
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #d62e2e;
+        }
+
+        img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+            width: 250px;
+        }
+
+        .search-icon {
+            width: 20px;
+            height: 20px;
+            margin-left: 5px;
+        }
+
+        .roadmap {
+            margin-left: 15px;
+            width: 50px;
+            height: auto;
+        }
+
+        #main {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .flex-container {
+            display: flex;
+            flex-direction: column;
+            margin: 20px;
+            padding: 20px;
+            background-color: white;
+            border: 2px solid black;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 1200px; /* Limit maximum width */
+        }
+
+        .flex-box {
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 2px solid black;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .box {
+            padding: 30px; /* Larger padding for nested boxes */
+            background-color: #ffffff;
+            border: 3px solid black;
+            border-radius: 5px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* More prominent shadow */
+            width: 95%; /* Larger nested box */
+            margin: 10px auto;
+        }
+
+        footer {
+            background: linear-gradient(to right, #8f0303, #410e70);
+            padding: 10px;
+            text-align: center;
+        }
+
+        footer a {
+            margin: 0 15px;
+            color: white;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-container {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            input[type="text"] {
+                width: 100%;
+            }
+
+            .roadmap, .home-icon {
+                margin: 10px 0;
+            }
+
+            .flex-container {
+                width: 100%;
+            }
+
+            .flex-box {
+                padding: 15px;
+            }
+
+            .box {
+                padding: 20px;
+                width: 100%; /* Full width in smaller screens */
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                align-items: center;
+            }
+
+            .search-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            input[type="text"] {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .search-icon {
+                margin: 0 auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- header -->
+    <header>
+        <div class="icon" id="icon">
+            <img src="C:/Users/Khyati Pahwa/Downloads/dsa.jfif" alt="Website Icon">
+        </div>
+        <div id="roadmap" class="roadmap">
+            <img src="C:/Users/Khyati Pahwa/Downloads/roadmap.png" alt="Roadmap">
+        </div>
+        <div class="home" id="home">
+            <img class="home-icon" src="C:/Users/Khyati Pahwa/Downloads/home.png" alt="home">
+        </div>
+    </header>
+
+    <!-- main content -->
+    <div id="main">
+        <h1>DIVIDE AND CONQUER</h1>
+        <div class="flex-container">
+            <div class="flex-box">
+                <h3>What is Divide and Conquer?</h3>
+                <div class="box">
+                    Divide and conquer is an algorithm design paradigm that recursively breaks down a problem into two or more sub-problems of the same or related type until these become simple enough to be solved directly.
+                </div>
+            </div>
+            <div class="flex-box">
+                <h3>Applications</h3>
+                <div class="box">
+                    Divide and conquer is used in various applications such as sorting algorithms (like Merge Sort and Quick Sort), binary search, and in algorithms for computational geometry.
+                </div>
+            </div>
+            <div class="flex-box">
+                <h3>Advantages & Disadvantages</h3>
+                <div class="box">
+                    Advantages: Efficient for large data sets and can be parallelized.<br>
+                    Disadvantages: Overhead of recursive calls can be significant for smaller problems.
+                </div>
+            </div>
+            <div class="flex-box">
+                <h3>Comparison with Other Algorithms</h3>
+                <div class="box">
+                    Divide and conquer differs from dynamic programming as it solves sub-problems independently, while dynamic programming solves overlapping sub-problems.
+                </div>
+            </div>
+            <div class="flex-box">
+                <h3>Time and Space Complexity</h3>
+                <div class="box">
+                    Time Complexity: O(n log n) for efficient divide and conquer algorithms like Merge Sort.<br>
+                    Space Complexity: O(n) for the auxiliary space used by some algorithms.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- footer -->
+    <footer>
+        <a href="#">About</a>
+        <a href="#">Team</a>
+        <a href="#">Terms of use</a>
+        <a href="#">Privacy policy</a>
+    </footer>
+</body>
+</html>

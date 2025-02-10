@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-Queens Problem</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px;
+            font-family: Arial, sans-serif;
+            height: 100vh; /* Full height of the viewport */
+            overflow: hidden; /* Prevent overflow */
+        }
+        .left-panel {
+            width: 40%;
+            padding-right: 20px;
+            overflow-y: auto; /* Allow scrolling if content overflows */
+        }
+        .right-panel {
+            width: 55%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            position: relative; /* For positioning the slider */
+        }
+        h1 {
+            text-align: left;
+        }
+        .container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+            width: 100%;
+        }
+        button {
+            padding: 10px 20px;
+            margin-left: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .chessboard {
+            display: grid;
+            border: 2px solid #333;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            max-height: calc(100vh - 300px); /* Adjust max height based on other elements */
+            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); /* Responsive sizing */
+            grid-template-rows: repeat(auto-fill, minmax(50px, 1fr));
+            margin: 0 auto; /* Center the chessboard */
+        }
+        .cell {
+            box-sizing: border-box;
+            border: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .black {
+            background-color: #333;
+        }
+        .white {
+            background-color: #fff;
+        }
+        .queen {
+            width: 40px;
+            height: 40px;
+        }
+        .info-box {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        #zoomSlider {
+            position: absolute;
+            bottom: 20px; /* Distance from bottom */
+            left: 50%; /* Center horizontally */
+            transform: translateX(-50%); /* Centering correction */
+            width: 80%; /* Width of the slider */
+        }
+    </style>
+</head>
+<body>
+    <div class="left-panel">
+        <h1>N-Queens Problem</h1>
+        <div class="info-box">
+            <h3>Problem Statement</h3>
+            <p>The N-Queens problem is the challenge of placing N chess queens on an N×N chessboard so that no two queens threaten each other. This means that no two queens can be in the same row, column, or diagonal.</p>
+        </div>
+        <div class="info-box">
+            <h3>Constraints</h3>
+            <ul>
+                <li>The board size N must be a positive integer.</li>
+                <li>Queens must be placed such that they do not attack each other.</li>
+                <li>Only one queen per row and column.</li>
+            </ul>
+        </div>
+        <div class="info-box">
+            <h3>Complexity</h3>
+            <p><strong>Time Complexity:</strong> O(N!)</p>
+            <p><strong>Space Complexity:</strong> O(N)</p>
+        </div>
+    </div>
+
+    <div class="right-panel">
+        <div class="container">
+            <input type="text" id="boardSize" placeholder="Enter board size (N)..."><br><br>
+            <button id="generateBoard">Generate Chessboard</button>
+            <button id="clearBoard">Clear Board</button> <!-- Clear Board Button -->
+        </div>
+        <div class="chessboard" id="chess"></div>
+        <input type="range" id="zoomSlider" min="0.1" max="2" step="0.1" value="1">
+    </div>
+
+    <script>
+        const queenIconPath = "C:\\Users\\Khyati Pahwa\\Pictures\\black queen.png"; // Path to the queen icon
+        let boardSize = 0;
+        let queenCount = 0;
+        let zoomLevel = 1; // Initial zoom level
+
+        function renderBoard(size) {
+            const chessContainer = document.getElementById("chess");
+            chessContainer.innerHTML = ""; // Clear the chessboard
+            chessContainer.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+            chessContainer.style.gridTemplateRows = `repeat(${size}, 1fr)`;
+
+            // Generate chessboard cells
+            for (let i = 0; i < size; i++) {
+                for (let j = 0; j < size; j++) {
+                    const cell = document.createElement("div");
+                    cell.className = "cell";
+                    cell.classList.add((i + j) % 2 === 0 ? "white" : "black");
+                    cell.dataset.row = i; // Store row index
+                    cell.dataset.col = j; // Store column index
+                    cell.addEventListener("click", () => toggleQueen(cell)); // Toggle queen on click
+                    chessContainer.appendChild(cell);
+                }
+            }
+        }
+
+        function toggleQueen(cell) {
+            const row = cell.dataset.row;
+            const col = cell.dataset.col;
+
+            // Check if there's already a queen in this cell
+            if (cell.querySelector("img")) {
+                // Remove queen if already present
+                cell.innerHTML = "";
+                queenCount--;
+            } else {
+                // Check if we can place a queen
+                if (queenCount < boardSize && isSafeToPlace(row, col)) {
+                    // Place queen
+                    const queen = document.createElement("img");
+                    queen.src = queenIconPath;
+                    queen.className = "queen";
+                    cell.appendChild(queen);
+                    queenCount++;
+                } else {
+                    alert("Cannot place queen here! Another queen threatens this position.");
+                }
+            }
+        }
+
+        function isSafeToPlace(row, col) {
+            const cells = document.querySelectorAll(".cell");
+            for (let cell of cells) {
+                const r = cell.dataset.row;
+                const c = cell.dataset.col;
+                if (cell.querySelector("img")) {
+                    // Check if the cell has a queen
+                    if (r === row || c === col || Math.abs(r - row) === Math.abs(c - col)) {
+                        return false; // Same row, same column, or diagonal
+                    }
+                }
+            }
+            return true; // Safe to place
+        }
+
+        document.getElementById("generateBoard").addEventListener("click", () => {
+            const input = parseInt(document.getElementById("boardSize").value);
+            if (isNaN(input) || input <= 0) {
+                alert("Please enter a valid board size greater than 0");
+                return;
+            }
+
+            boardSize = input;
+            queenCount = 0; // Reset queen count for new board
+            renderBoard(boardSize);
+            document.getElementById("boardSize").value = ""; // Clear input field
+        });
+
+        document.getElementById("clearBoard").addEventListener("click", () => {
+            const cells = document.querySelectorAll(".cell");
+            cells.forEach(cell => {
+                cell.innerHTML = ""; // Clear each cell
+            });
+            queenCount = 0; // Reset queen count
+        });
+
+        document.getElementById("zoomSlider").addEventListener("input", (event) => {
+            zoomLevel = event.target.value; // Get the value from the slider
+            document.getElementById("chess").style.transform = `scale(${zoomLevel})`;
+        });
+    </script>
+</body>
+</html>

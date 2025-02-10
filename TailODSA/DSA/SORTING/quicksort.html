@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quick Sort Visualization</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        .array-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .bar {
+            width: 20px;
+            height: 100px;
+            margin: 0 5px;
+            background-color: #3498db;
+            transition: height 0.5s ease-in-out, background-color 0.5s ease-in-out;
+        }
+
+        .highlight {
+            background-color: #e74c3c;
+        }
+
+        .pivot {
+            background-color: #f39c12;
+        }
+
+        .sorted {
+            background-color: #2ecc71;
+        }
+
+        input {
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Quick Sort Visualization</h1>
+    <input type="text" id="arrayInput" placeholder="Enter array elements separated by commas">
+    <button onclick="visualizeQuickSort()">Visualize</button>
+    <div id="arrayContainer"></div>
+
+    <script>
+        function quickSort(arr, low, high) {
+            if (low < high) {
+                const pi = partition(arr, low, high);
+                quickSort(arr, low, pi - 1);
+                quickSort(arr, pi + 1, high);
+            }
+        }
+
+        function    partition(arr, low, high) {
+            const pivot = arr[high];
+            let i = low - 1;
+
+            for (let j = low; j < high; j++) {
+                if (arr[j] <= pivot) {
+                    i++;
+                    swap(arr, i, j);
+                }
+            }
+
+            swap(arr, i + 1, high);
+            return i + 1;
+        }
+
+        function    swap(arr, i, j) {
+            const temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+        }
+
+        function    visualizeQuickSort() {
+            const inputArray = document.getElementById("arrayInput").value.split(",").map(Number);
+            const container = document.getElementById("arrayContainer");
+
+            // Create bars for each element
+            inputArray.forEach(num => {
+                const bar = document.createElement("div");
+                bar.classList.add("bar");
+                bar.style.height = num * 10 + "px";
+                container.appendChild(bar);
+            });
+
+            quickSort(inputArray, 0, inputArray.length - 1);
+
+            // Visualize the sorting process
+            const bars = document.querySelectorAll(".bar");
+            let i = 0;
+
+            function updateBars() {
+                bars.forEach((bar, index) => {
+                    bar.style.height = inputArray[index] * 10 + "px";
+                    if (index === i) {
+                        bar.classList.add("pivot");
+                    } else if (index < i) {
+                        bar.classList.add("sorted");
+                    }
+                });
+                i++;
+                if (i < inputArray.length) {
+                    setTimeout(updateBars, 500);
+                }
+            }
+
+            updateBars();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hierarchical Merge Sort Animation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, white, rgb(78, 28, 28));
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Ensures footer stays at the bottom */
+        }
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #d62e2e;
+        }
+        img {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+        }
+        footer {
+            background: linear-gradient(to right, #8f0303, #410e70);
+            padding: 10px;
+            text-align: center;
+            margin-top: auto; /* Push footer to the bottom */
+        }
+        footer a {
+            margin: 0 15px;
+            color: white;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+        .input-container {
+            margin: 20px 0;
+        }
+        input[type="text"] {
+            padding: 10px;
+            border: 2px solid #d62e2e;
+            border-radius: 5px;
+            outline: none;
+            width: 300px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #d62e2e;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .array-container {
+            display: flex;
+            flex-direction: column; /* Stack arrays vertically */
+            margin: 20px 0;
+            position: relative;
+        }
+        .array-item-row {
+            display: flex; /* Display items in a row */
+            justify-content: center; /* Center items */
+            margin: 10px 0; /* Spacing between rows */
+        }
+        .array-item {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid black;
+            margin: 5px;
+            position: relative;
+            transition: transform 0.3s, background-color 0.3s;
+        }
+        .tab {
+            margin-left: 80px; /* Space between halves */
+        }
+        .swap {
+            background-color: yellow; /* Color for swapped items */
+        }
+        .result-box {
+            display: none;
+            margin-top: 20px;
+            padding: 10px;
+            border: 2px solid #d62e2e;
+            background-color: #fff3cd;
+        }
+        .status-block {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 60px; /* Adjust based on header height */
+            right: 20px;
+            width: 200px;
+            background-color: white;
+            border: 1px solid #d62e2e;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .swapped-label {
+            background-color: yellow;
+            padding: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .swap-reason {
+            font-size: 12px;
+            color: #333;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- header -->
+    <header>
+        <div class="icon" id="icon">
+            <img src="C:/Users/Khyati Pahwa/Downloads/dsa.jfif" alt="Website Icon">
+        </div>
+        <div id="roadmap" class="roadmap">
+            <img src="C:/Users/Khyati Pahwa/Downloads/roadmap.png" alt="Roadmap">
+        </div>
+        <div class="home" id="home">
+            <img class="home-icon" src="c:/Users/Khyati Pahwa/Downloads/home.png" alt="home">
+        </div>
+    </header>
+
+    <!-- Status Block -->
+    <div class="status-block" id="statusBlock">
+        <div class="swapped-label" id="swappedLabel">Swapped</div>
+        <div class="swap-reason" id="swapReason">Condition: Element is less than pivot</div>
+    </div>
+
+    <!-- Input and sort functionality -->
+    <div class="input-container">
+        <input type="text" id="numberInput" placeholder="Enter up to 25 numbers (comma separated)">
+        <button onclick="createArray()">Create Array</button>
+    </div>
+    <div class="input-container">
+        <button onclick="mergeSort()">Sort with Merge Sort</button>
+    </div>
+
+    <!-- Array display -->
+    <div class="array-container" id="arrayContainer"></div>
+    <div class="result-box" id="resultBox"></div>
+
+    <!-- footer -->
+    <footer>
+        <a href="#">About</a>
+        <a href="#">Team</a>
+        <a href="#">Terms of use</a>
+        <a href="#">Privacy policy</a>
+    </footer>
+
+    <script>
+        let arr = [];
+        let swapCount = 0;
+
+        function createArray() {
+            const input = document.getElementById('numberInput').value;
+            arr = input.split(',').map(num => num.trim()).slice(0, 25).map(Number);
+            displayArray(arr, 'Original Array');
+        }
+
+        function displayArray(array, label) {
+            const container = document.getElementById('arrayContainer');
+            const arrayDiv = document.createElement('div');
+            arrayDiv.classList.add('array-item-row');
+            arrayDiv.innerHTML = `<strong>${label}:</strong>`;
+            array.forEach((num) => {
+                const item = document.createElement('div');
+                item.classList.add('array-item');
+                item.innerText = num;
+                arrayDiv.appendChild(item);
+            });
+            container.appendChild(arrayDiv);
+        }
+
+        async function mergeSort() {
+            const resultBox = document.getElementById('resultBox');
+            resultBox.style.display = 'none';
+            swapCount = 0;
+
+            await sort(arr, 0, arr.length - 1);
+            resultBox.innerHTML = `Sorted Array: ${arr.join(', ')}<br>Number of Swaps: ${swapCount}<br>Time Complexity: O(n log n)<br>Space Complexity: O(n)`;
+            resultBox.style.display = 'block';
+        }
+
+        async function sort(array, left, right) {
+            if (left < right) {
+                const mid = Math.floor((left + right) / 2);
+
+                // Display the two halves with space
+                const leftHalf = array.slice(left, mid + 1);
+                const rightHalf = array.slice(mid + 1, right + 1);
+
+                displayArray(leftHalf, 'Left Half');
+                const tabDiv = document.createElement('div');
+                tabDiv.classList.add('array-item-row');
+                tabDiv.innerHTML = `<div class="tab"></div>`; // Create space
+                container.appendChild(tabDiv);
+                displayArray(rightHalf, 'Right Half');
+
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second
+
+                await sort(array, left, mid);
+                await sort(array, mid + 1, right);
+                await merge(array, left, mid, right);
+            }
+        }
+
+        async function merge(array, left, mid, right) {
+            const leftArray = array.slice(left, mid + 1);
+            const rightArray = array.slice(mid + 1, right + 1);
+            let i = 0, j = 0, k = left;
+
+            while (i < leftArray.length && j < rightArray.length) {
+                if (leftArray[i] <= rightArray[j]) {
+                    array[k] = leftArray[i];
+                    i++;
+                } else {
+                    array[k] = rightArray[j];
+                    j++;
+                    swapCount++;
+                    // Update status block
+                    document.getElementById('swappedLabel').innerText = `Swapped: ${rightArray[j-1]} and ${leftArray[i]}`;
+                    document.getElementById('swapReason').innerText = `Condition: ${rightArray[j-1]} < ${leftArray[i]}`;
+
+                    // Highlight swapped elements in yellow
+                    const container = document.getElementById('arrayContainer');
+                    const items = container.querySelectorAll('.array-item');
+                    items[k].classList.add('swap'); // Highlight current item
+                    items[i + left].classList.add('swap'); // Highlight left item
+                }
+                k++;
+            }
+
+            while (i < leftArray.length) {
+                array[k] = leftArray[i];
+                i++;
+                k++;
+            }
+
+            while (j < rightArray.length) {
+                array[k] = rightArray[j];
+                j++;
+                k++;
+            }
+
+            // No current merged array display
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second
+        }
+    </script>
+</body>
+</html>

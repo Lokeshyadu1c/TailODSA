@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stack Implementation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: rgb(236, 125, 74);
+        }
+        #stack {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 200px;
+            border: 2px solid #333;
+            margin: 20px;
+            padding: 10px;
+            position: relative;
+        }
+        .item {
+            width: 50px;
+            height: 50px;
+            background-color: #4CAF50;
+            margin: 5px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            transition: transform 0.5s ease;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        #inputValue {
+            margin: 10px;
+            padding: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Stack Implementation</h1>
+    <div id="stack"></div>
+    <input type="text" id="inputValue" placeholder="Enter value to push" />
+    <button onclick="push()">Push</button>
+    <button onclick="pop()">Pop</button>
+
+    <script>
+        let stack = [];
+
+        function push() {
+            const inputValue = document.getElementById('inputValue').value;
+            if (inputValue === '') {
+                alert("Please enter a value!");
+                return;
+            }
+            const item = document.createElement('div');
+            item.className = 'item';
+            item.innerText = inputValue;
+
+            document.getElementById('stack').appendChild(item);
+            stack.push(inputValue);
+            document.getElementById('inputValue').value = ''; // Clear input
+        }
+
+        function pop() {
+            if (stack.length > 0) {
+                const item = document.querySelector('.item:last-child');
+                item.style.transform = 'translateY(-50px)';
+                setTimeout(() => {
+                    item.remove();
+                    stack.pop();
+                }, 500);
+            } else {
+                alert("Stack is empty!");
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traveling Salesman Problem Animation</title>
+    <style>
+        /* General Styling */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            background: #f0f0f0;
+        }
+
+        #problem-statement {
+            width: 50%;
+            padding: 20px;
+            background-color: white;
+            border-right: 2px solid #ccc;
+        }
+
+        #animation {
+            width: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            background-color: #fff;
+        }
+
+        #city {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+            transition: transform 0.5s ease;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .constraints {
+            margin-top: 20px;
+        }
+
+        footer {
+            background: #2e6ed6;
+            padding: 10px;
+            text-align: center;
+            color: white;
+        }
+    </style>
+    <script>
+        let cities = [
+            { x: 100, y: 150 },
+            { x: 200, y: 50 },
+            { x: 300, y: 200 },
+            { x: 400, y: 80 },
+            { x: 250, y: 300 }
+        ];
+        let currentCity = 0;
+
+        function animateTSP() {
+            const cityElement = document.getElementById('city');
+            if (currentCity < cities.length) {
+                cityElement.style.transform = `translate(${cities[currentCity].x}px, ${cities[currentCity].y}px)`;
+                currentCity++;
+                setTimeout(animateTSP, 1000); // Move to the next city every second
+            } else {
+                currentCity = 0; // Reset animation
+                setTimeout(animateTSP, 1000);
+            }
+        }
+
+        window.onload = function() {
+            animateTSP();
+        };
+    </script>
+</head>
+<body>
+    <div id="problem-statement">
+        <h1>Traveling Salesman Problem</h1>
+        <p>The Traveling Salesman Problem (TSP) is a classic optimization problem where a salesman must visit a set of cities, returning to the origin city while minimizing the total travel distance.</p>
+        <div class="constraints">
+            <h3>Constraints:</h3>
+            <ul>
+                <li>Each city must be visited exactly once.</li>
+                <li>The salesman must return to the starting city.</li>
+                <li>Travel distances between cities are known.</li>
+                <li>Objective is to minimize the total travel distance.</li>
+            </ul>
+        </div>
+    </div>
+    <div id="animation">
+        <div id="city"></div>
+    </div>
+    <footer>
+        <p>Traveling Salesman Problem Animation</p>
+    </footer>
+</body>
+</html>

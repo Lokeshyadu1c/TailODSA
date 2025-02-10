@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linked List Animation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        .list-box {
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 300px;
+            max-width: 100%;
+            overflow-x: auto;
+        }
+        .list {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .node {
+            width: 50px;
+            height: 50px;
+            background-color: #4CAF50;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 5px;
+            margin: 0 5px;
+            transition: all 0.5s ease;
+            position: relative;
+        }
+        .node.head {
+            background-color: #FF5722;
+        }
+        .null {
+            width: 50px;
+            height: 50px;
+            background-color: #ccc;
+            color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 5px;
+            margin: 0 5px;
+        }
+        .arrow {
+            font-size: 24px;
+            margin: 0 5px;
+        }
+        input {
+            margin: 5px;
+            width: 70px;
+        }
+        .step {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Linked List Animation</h1>
+    <div class="controls">
+        <input type="number" id="nodeValue" placeholder="Node Value" />
+        <button onclick="showInsertOptions()">Insert</button>
+        <button onclick="showDeleteOptions()">Delete</button>
+        <div id="insertOptions" style="display: none;">
+            <button onclick="addNodeAtEnd()">At End</button>
+            <button onclick="addNodeAtStart()">At Start</button>
+            <button onclick="addNodeInBetween()">In Between</button>
+        </div>
+        <div id="deleteOptions" style="display: none;">
+            <button onclick="deleteNode()">By Value</button>
+            <button onclick="deleteNodeAtStart()">At Start</button>
+            <button onclick="deleteNodeAtEnd()">At End</button>
+            <button onclick="deleteNodeInBetween()">In Between</button>
+        </div>
+    </div>
+    <div class="list-box">
+        <div class="list" id="linkedList"></div>
+        <div class="step" id="algorithmSteps"></div>
+    </div>
+</div>
+
+<script>
+    let head = null;
+    const linkedListContainer = document.getElementById('linkedList');
+    const algorithmStepsContainer = document.getElementById('algorithmSteps');
+
+    function showInsertOptions() {
+        document.getElementById('insertOptions').style.display = 'block';
+        document.getElementById('deleteOptions').style.display = 'none';
+    }
+
+    function showDeleteOptions() {
+        document.getElementById('deleteOptions').style.display = 'block';
+        document.getElementById('insertOptions').style.display = 'none';
+    }
+
+    function addNodeAtEnd() {
+        const value = document.getElementById('nodeValue').value;
+        if (value === '') return;
+
+        const newNode = {
+            value: parseInt(value),
+            next: null
+        };
+
+        if (!head) {
+            head = newNode;
+        } else {
+            let current = head;
+            while (current.next) {
+                current = current.next;
+            }
+            current.next = newNode;
+        }
+
+        document.getElementById('nodeValue').value = '';
+        animateList();
+    }
+
+    function addNodeAtStart() {
+        const value = document.getElementById('nodeValue').value;
+        if (value === '') return;
+
+        const newNode = {
+            value: parseInt(value),
+            next: head
+        };
+        head = newNode;
+
+        document.getElementById('nodeValue').value = '';
+        animateList();
+    }
+
+    function addNodeInBetween() {
+        const value = document.getElementById('nodeValue').value;
+        const position = parseInt(prompt("Enter position to insert (0 for start, 1 for 2nd, etc.):"));
+        if (value === '' || isNaN(position)) return;
+
+        const newNode = {
+            value: parseInt(value),
+            next: null
+        };
+
+        if (position === 0) {
+            addNodeAtStart();
+            return;
+        }
+
+        let current = head;
+        let count = 0;
+
+        while (current && count < position - 1) {
+            current = current.next;
+            count++;
+        }
+
+        if (current) {
+            newNode.next = current.next;
+            current.next = newNode;
+        } else {
+            alert("Position out of bounds");
+        }
+
+        document.getElementById('nodeValue').value = '';
+        animateList();
+    }
+
+    function deleteNode() {
+        const value = document.getElementById('nodeValue').value;
+        if (value === '') return;
+
+        let current = head;
+        let prev = null;
+
+        while (current && current.value !== parseInt(value)) {
+            prev = current;
+            current = current.next;
+        }
+
+        if (current) {
+            if (prev) {
+                prev.next = current.next;
+            } else {
+                head = current.next; // Deleting the head
+            }
+        }
+
+        document.getElementById('nodeValue').value = '';
+        animateList();
+    }
+
+    function deleteNodeAtStart() {
+        if (!head) return;
+        head = head.next;
+        animateList();
+    }
+
+    function deleteNodeAtEnd() {
+        if (!head) return;
+
+        if (!head.next) {
+            head = null; // If there's only one node
+            animateList();
+            return;
+        }
+
+        let current = head;
+        while (current.next && current.next.next) {
+            current = current.next;
+        }
+        current.next = null; // Remove last node
+        animateList();
+    }
+
+    function deleteNodeInBetween() {
+        const value = document.getElementById('nodeValue').value;
+        if (value === '') return;
+
+        let current = head;
+        let prev = null;
+
+        while (current && current.value !== parseInt(value)) {
+            prev = current;
+            current = current.next;
+        }
+
+        if (current && prev) {
+            prev.next = current.next;
+        } else if (current) {
+            head = current.next; // Deleting the head
+        }
+
+        document.getElementById('nodeValue').value = '';
+        animateList();
+    }
+
+    function animateList() {
+        linkedListContainer.innerHTML = '';
+        let current = head;
+
+        while (current) {
+            const nodeElement = document.createElement('div');
+            nodeElement.classList.add('node');
+            if (current === head) {
+                nodeElement.classList.add('head'); // Highlight the head node
+                nodeElement.innerText = 'head\n' + current.value;
+            } else {
+                nodeElement.innerText = current.value;
+            }
+
+            linkedListContainer.appendChild(nodeElement);
+
+            if (current.next) {
+                const arrowElement = document.createElement('span');
+                arrowElement.classList.add('arrow');
+                arrowElement.innerText = '→';
+                linkedListContainer.appendChild(arrowElement);
+            }
+
+            current = current.next;
+        }
+
+        // Add null box at the end
+        const nullElement = document.createElement('div');
+        nullElement.classList.add('null');
+        nullElement.innerText = 'null';
+        linkedListContainer.appendChild(nullElement);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue Animation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #3b553b;
+        }
+        #queue {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 200px;
+            border: 2px solid #333;
+            margin: 20px;
+            padding: 10px;
+            position: relative;
+        }
+        .item {
+            width: 50px;
+            height: 50px;
+            background-color: #4CAF50;
+            margin: 0 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            transition: transform 0.5s ease;
+            position: relative;
+        }
+        .front-label, .rear-label {
+            position: absolute;
+            top: -20px;
+            font-weight: bold;
+            background-color: #fff;
+            padding: 2px 5px;
+            border: 1px solid #333;
+            border-radius: 3px;
+            z-index: 1;
+        }
+        .front-label {
+            left: 0;
+        }
+        .rear-label {
+            right: 0;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        #inputValue {
+            margin: 10px;
+            padding: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Queue Animation</h1>
+    <div id="queue"></div>
+    <input type="text" id="inputValue" placeholder="Enter value to enqueue" />
+    <button onclick="enqueue()">Enqueue</button>
+    <button onclick="dequeue()">Dequeue</button>
+    <div id="front">Front: None</div>
+    <div id="rear">Rear: None</div>
+
+    <script>
+        let queue = [];
+
+        function enqueue() {
+            const inputValue = document.getElementById('inputValue').value;
+            if (inputValue === '') {
+                alert("Please enter a value!");
+                return;
+            }
+            const item = document.createElement('div');
+            item.className = 'item';
+            item.innerText = inputValue;
+
+            document.getElementById('queue').appendChild(item);
+            animateEnqueue(item);
+            queue.push(item);
+            updateFrontRear();
+            document.getElementById('inputValue').value = ''; // Clear input
+        }
+
+        function dequeue() {
+            if (queue.length > 0) {
+                const item = queue.shift();
+                animateDequeue(item);
+                updateFrontRear();
+            } else {
+                alert("Queue is empty!");
+            }
+        }
+
+        function animateEnqueue(item) {
+            item.style.transform = 'translateY(-50px)';
+            setTimeout(() => {
+                item.style.transform = 'translateY(0)';
+            }, 100);
+        }
+
+        function animateDequeue(item) {
+            item.style.transform = 'translateY(-50px)';
+            setTimeout(() => {
+                item.remove();
+            }, 500);
+        }
+
+        function updateFrontRear() {
+            const frontItem = queue[0];
+            const rearItem = queue[queue.length - 1];
+            
+            // Update front and rear display
+            const front = frontItem ? frontItem.innerText : 'None';
+            const rear = rearItem ? rearItem.innerText : 'None';
+            document.getElementById('front').innerText = `Front: ${front}`;
+            document.getElementById('rear').innerText = `Rear: ${rear}`;
+
+            // Clear previous labels
+            document.querySelectorAll('.front-label, .rear-label').forEach(label => label.remove());
+
+            // Create new labels for front and rear
+            if (frontItem) {
+                const frontLabel = document.createElement('div');
+                frontLabel.className = 'front-label';
+                frontLabel.innerText = 'Front';
+                frontItem.appendChild(frontLabel);
+            }
+            if (rearItem) {
+                const rearLabel = document.createElement('div');
+                rearLabel.className = 'rear-label';
+                rearLabel.innerText = 'Rear';
+                rearItem.appendChild(rearLabel);
+            }
+        }
+    </script>
+</body>
+</html>
+

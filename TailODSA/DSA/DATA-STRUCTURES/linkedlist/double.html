@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doubly Linked List Animation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        .list-box {
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 300px;
+            max-width: 100%;
+            overflow-x: auto;
+        }
+        .list {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .node {
+            width: 50px;
+            height: 50px;
+            background-color: #4CAF50;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 5px;
+            margin: 0 5px;
+            transition: all 0.5s ease;
+            position: relative;
+        }
+        .node.head {
+            background-color: #FF5722;
+        }
+        .null {
+            width: 50px;
+            height: 50px;
+            background-color: #ccc;
+            color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 5px;
+            margin: 0 5px;
+        }
+        .arrow {
+            font-size: 24px;
+            margin: 0 5px;
+        }
+        input {
+            margin: 5px;
+            width: 70px;
+        }
+        .step {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Doubly Linked List Animation</h1>
+    <div class="controls">
+        <input type="number" id="nodeValue" placeholder="Node Value" />
+        <button onclick="showInsertOptions()">Insert</button>
+        <button onclick="showDeleteOptions()">Delete</button>
+        <div id="insertOptions" style="display: none;">
+            <button onclick="addDoublyNodeAtEnd()">At End</button>
+            <button onclick="addDoublyNodeAtStart()">At Start</button>
+            <button onclick="addDoublyNodeInBetween()">In Between</button>
+        </div>
+        <div id="deleteOptions" style="display: none;">
+            <button onclick="deleteDoublyNode()">By Value</button>
+            <button onclick="deleteDoublyNodeAtStart()">At Start</button>
+            <button onclick="deleteDoublyNodeAtEnd()">At End</button>
+        </div>
+    </div>
+    <div class="list-box">
+        <div class="list" id="doublyLinkedList"></div>
+        <div class="step" id="doublyAlgorithmSteps"></div>
+    </div>
+</div>
+
+<script>
+    let doublyHead = null;
+    const doublyLinkedListContainer = document.getElementById('doublyLinkedList');
+
+    function showInsertOptions() {
+        document.getElementById('insertOptions').style.display = 'block';
+        document.getElementById('deleteOptions').style.display = 'none';
+    }
+
+    function showDeleteOptions() {
+        document.getElementById('deleteOptions').style.display = 'block';
+        document.getElementById('insertOptions').style.display = 'none';
+    }
+
+    function addDoublyNodeAtEnd() {
+        const value = document.getElementById('nodeValue').value;
+        if (value === '') return;
+
+        const newNode = {
+            value: parseInt(value),
+            next: null,
+            prev: null
+        };
+
+        if (!doublyHead) {
+            doublyHead = newNode;
+        } else {
+            let current = doublyHead;
+            while (current.next) {
+                current = current.next;
+            }
+            current.next = newNode;
+            newNode.prev = current;
+        }
+
+        document.getElementById('nodeValue').value = '';
+        animateDoublyList();
+    }
+
+    function addDoublyNodeAtStart() {
+        const value = document.getElementById('nodeValue').value;
+        if (value === '') return;
+
+        const newNode = {
+            value: parseInt(value),
+            next: doublyHead,
+            prev: null
+        };
+        if (doublyHead) {
+            doublyHead.prev = newNode;
+        }
+        doublyHead = newNode;
+
+        document.getElementById('nodeValue').value = '';
+        animateDoublyList();
+    }
+
+    function addDoublyNodeInBetween() {
+        const value = document.getElementById('nodeValue').value;
+        const position = parseInt(prompt("Enter position to insert (0 for start, 1 for 2nd, etc.):"));
+        if (value === '' || isNaN(position)) return;
+
+        const newNode = {
+            value: parseInt(value),
+            next: null,
+            prev: null
+        };
+
+        if (position === 0) {
+            addDoublyNodeAtStart();
+            return;
+        }
+
+        let current = doublyHead;
+        let count = 0;
+
+        while (current && count < position - 1) {
+            current = current.next;
+            count++;
+        }
+
+        if (current) {
+            newNode.next = current.next;
+            newNode.prev = current;
+            if (current.next) {
+                current.next.prev = newNode;
+            }
+            current.next = newNode;
+        } else {
+            alert("Position out of bounds");
+        }
+
+        document.getElementById('nodeValue').value = '';
+        animateDoublyList();
+    }
+
+    function deleteDoublyNode() {
+        const value = document.getElementById('nodeValue').value;
+        if (value === '') return;
+
+        let current = doublyHead;
+
+        while (current && current.value !== parseInt(value)) {
+            current = current.next;
+        }
+
+        if (current) {
+            if (current.prev) {
+                current.prev.next = current.next;
+            } else {
+                doublyHead = current.next; // Deleting the head
+            }
+            if (current.next) {
+                current.next.prev = current.prev;
+            }
+        }
+
+        document.getElementById('nodeValue').value = '';
+        animateDoublyList();
+    }
+
+    function deleteDoublyNodeAtStart() {
+        if (!doublyHead) return;
+        doublyHead = doublyHead.next;
+        if (doublyHead) {
+            doublyHead.prev = null;
+        }
+        animateDoublyList();
+    }
+
+    function deleteDoublyNodeAtEnd() {
+        if (!doublyHead) return;
+
+        if (!doublyHead.next) {
+            doublyHead = null; // If there's only one node
+            animateDoublyList();
+            return;
+        }
+
+        let current = doublyHead;
+        while (current.next) {
+            current = current.next;
+        }
+        current.prev.next = null; // Remove last node
+        animateDoublyList();
+    }
+
+    function animateDoublyList() {
+        doublyLinkedListContainer.innerHTML = '';
+        let current = doublyHead;
+
+        while (current) {
+            const nodeElement = document.createElement('div');
+            nodeElement.classList.add('node');
+            if (current === doublyHead) {
+                nodeElement.classList.add('head'); // Highlight the head node
+                nodeElement.innerText = 'head\n' + current.value;
+            } else {
+                nodeElement.innerText = current.value;
+            }
+
+            doublyLinkedListContainer.appendChild(nodeElement);
+
+            if (current.next) {
+                const arrowElement = document.createElement('span');
+                arrowElement.classList.add('arrow');
+                arrowElement.innerText = '↔️'; // Double arrow for doubly linked list
+                doublyLinkedListContainer.appendChild(arrowElement);
+            }
+
+            current = current.next;
+        }
+
+        // Add null box at the end
+        const nullElement = document.createElement('div');
+        nullElement.classList.add('null');
+        nullElement.innerText = 'null';
+        doublyLinkedListContainer.appendChild(nullElement);
+    }
+</script>
+</body>
+</html>

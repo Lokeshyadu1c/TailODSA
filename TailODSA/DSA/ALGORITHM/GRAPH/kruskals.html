@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kruskal's Algorithm Animation</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+            background: linear-gradient(to right, #ffe0b2, #ffffff);
+        }
+
+        #problemStatement {
+            width: 50%;
+            padding: 20px;
+            border-right: 2px solid #333;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        #animationContainer {
+            width: 50%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #animationArea {
+            position: relative;
+            width: 100%;
+            height: 60%;
+            border: 2px solid #333;
+            background-color: #e0e0e0;
+            overflow: hidden;
+        }
+
+        .node {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #FF5722;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            z-index: 2;
+        }
+
+        .edge {
+            position: absolute;
+            height: 2px;
+            background-color: #333;
+            z-index: 1;
+        }
+
+        #inputContainer {
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        input {
+            margin: 5px;
+            padding: 10px;
+            width: 200px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #FF5722;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #d45d00;
+        }
+
+        #selectedEdgesContainer {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #fff;
+            border: 2px solid #333;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        .edgeItem {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            margin: 5px 0;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="problemStatement">
+        <h1>Kruskal's Algorithm</h1>
+        <p><strong>Problem Statement:</strong></p>
+        <p>Given a connected, undirected graph, Kruskal's algorithm finds a minimum spanning tree (MST) for that graph.</p>
+        
+        <p><strong>Input:</strong></p>
+        <p>Graph: A set of nodes and edges with weights.</p>
+        
+        <p><strong>Constraints:</strong></p>
+        <ul>
+            <li>Number of Nodes (n): 1 ≤ n ≤ 100</li>
+            <li>Weights: Each weight is a non-negative integer.</li>
+        </ul>
+    </div>
+    <div id="animationContainer">
+        <div id="inputContainer">
+            <input type="text" id="edgesInput" placeholder="Edges (format: node1,node2,weight)">
+            <button onclick="startAnimation()">Start Animation</button>
+            <button onclick="resetAnimation()">Reset</button>
+        </div>
+        <div id="animationArea"></div>
+        <div id="selectedEdgesContainer">
+            <h3>Selected Edges</h3>
+            <div id="selectedEdges"></div>
+        </div>
+    </div>
+
+    <script>
+        const animationArea = document.getElementById('animationArea');
+        const selectedEdgesContainer = document.getElementById('selectedEdges');
+
+        const nodes = {};
+        const edges = [];
+
+        function createNode(id, x, y) {
+            const node = document.createElement('div');
+            node.className = 'node';
+            node.style.left = `${x}px`;
+            node.style.top = `${y}px`;
+            node.innerText = id;
+            animationArea.appendChild(node);
+            nodes[id] = { x, y };
+        }
+
+        function createEdge(node1, node2) {
+            const edge = document.createElement('div');
+            edge.className = 'edge';
+            const x1 = nodes[node1].x + 15; // Center the node
+            const y1 = nodes[node1].y + 15; // Center the node
+            const x2 = nodes[node2].x + 15; // Center the node
+            const y2 = nodes[node2].y + 15; // Center the node
+            edge.style.left = Math.min(x1, x2) + 'px';
+            edge.style.top = Math.min(y1, y2) + 'px';
+            edge.style.width = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2) + 'px';
+            edge.style.transform = `rotate(${Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI}deg)`;
+            animationArea.appendChild(edge);
+            edges.push({ node1, node2 });
+        }
+
+        function displaySelectedEdges(selectedEdges) {
+            selectedEdgesContainer.innerHTML = ''; // Clear previous edges
+            selectedEdges.forEach(edge => {
+                const edgeItem = document.createElement('div');
+                edgeItem.className = 'edgeItem';
+                edgeItem.innerHTML = `Edge: ${edge.node1} - ${edge.node2}`;
+                selectedEdgesContainer.appendChild(edgeItem);
+            });
+        }
+
+        function startAnimation() {
+            const edgesInput = document.getElementById('edgesInput').value.split(';');
+            const edgeList = [];
+            const selectedEdges = [];
+
+            edgesInput.forEach(edgeInput => {
+                const [node1, node2, weight] = edgeInput.split(',').map(item => item.trim());
+                createNode(node1, Math.random() * 400, Math.random() * 400); // Random position
+                createNode(node2, Math.random() * 400, Math.random() * 400); // Random position
+                createEdge(node1, node2);
+                edgeList.push({ node1, node2, weight: parseInt(weight) });
+            });
+
+            // Sort edges by weight
+            edgeList.sort((a, b) => a.weight - b.weight);
+
+            const parent = {};
+            const rank = {};
+
+            function find(node) {
+                if (parent[node] === undefined) {
+                    parent[node] = node;
+                    rank[node] = 0;
+                }
+                if (parent[node] !== node) {
+                    parent[node] = find(parent[node]);
+                }
+                return parent[node];
+            }
+
+            function union(node1, node2) {
+                const root1 = find(node1);
+                const root2 = find(node2);
+                if (root1 !== root2) {
+                    if (rank[root1] > rank[root2]) {
+                        parent[root2] = root1;
+                    } else if (rank[root1] < rank[root2]) {
+                        parent[root1] = root2;
+                    } else {
+                        parent[root2] = root1;
+                        rank[root1]++;
+                    }
+                }
+            }
+
+            edgeList.forEach(edge => {
+                const { node1, node2 } = edge;
+                if (find(node1) !== find(node2)) {
+                    selectedEdges.push(edge);
+                    createEdge(node1, node2);
+                    union(node1, node2);
+                }
+            });
+
+            displaySelectedEdges(selectedEdges); // Display selected edges
+        }
+
+        function resetAnimation() {
+            const nodeElements = document.querySelectorAll('.node');
+            nodeElements.forEach(node => node.remove());
+            const edgeElements = document.querySelectorAll('.edge');
+            edgeElements.forEach(edge => edge.remove());
+            selectedEdgesContainer.innerHTML = ''; // Clear selected edges
+            edges.length = 0; // Clear edges array
+            for (const key in nodes) {
+                delete nodes[key]; // Clear nodes object
+            }
+        }
+    </script>
+</body>
+</html>

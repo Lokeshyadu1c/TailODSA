@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Linked List Visualizer</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        #list-types {
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #visualization-container {
+            margin-top: 50px;
+        }
+
+        .node {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 1px solid black;
+            border-radius: 5px;
+            margin-right: 10px;
+            text-align: center;
+            line-height: 50px;
+        }
+
+        .arrow {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-top: 2px solid black;
+            border-right: 2px solid black;
+            transform: rotate(45deg);
+            margin-left: -10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Linked List Visualizer</h1>
+
+    <div id="list-types">
+        <button id="s">Singly Linked List</button>
+        <button id="d">Doubly Linked List</button>
+        <button id="c">Circular Linked List</button>
+    </div>
+</body>
+<script>
+ document.getElementById('s').addEventListener('click', () => {
+          window.location.href = "/DSA/DATA-STRUCTURES/linkedlist/index.html"
+      });
+      document.getElementById('d').addEventListener('click', () => {
+          window.location.href = "/DSA/DATA-STRUCTURES/linkedlist/double.html"
+      });
+      document.getElementById('c').addEventListener('click', () => {
+          window.location.href = "/DSA/DATA-STRUCTURES/linkedlist/circular.html"
+      });
+</script>
+</html>

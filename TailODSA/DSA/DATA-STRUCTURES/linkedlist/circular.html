@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circular Linked List Animation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        .list-box {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            border: 2px solid #4CAF50;
+            border-radius: 50%;
+            background-color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .node {
+            width: 50px;
+            height: 50px;
+            background-color: #4CAF50;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            position: absolute;
+            transition: all 0.5s ease;
+        }
+        .node.selected {
+            transform: scale(1.2);
+            background-color: #ff5722; /* Highlight color */
+        }
+        .arrow {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: transparent;
+            border: solid #4CAF50;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+        }
+        input {
+            margin: 5px;
+            width: 70px;
+        }
+        .step {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .complexity {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Circular Linked List Animation</h1>
+    <div class="controls">
+        <input type="number" id="nodeValue" placeholder="Node Value" />
+        <button onclick="showInsertOptions()">Insert</button>
+        <button onclick="showDeleteOptions()">Delete</button>
+        <button onclick="searchNode()">Search</button>
+        <div id="insertOptions" style="display: none;">
+            <button onclick="addCircularNodeAtEnd()">At End</button>
+            <button onclick="addCircularNodeAtStart()">At Start</button>
+            <button onclick="addCircularNodeInBetween()">In Between</button>
+        </div>
+        <div id="deleteOptions" style="display: none;">
+            <button onclick="deleteCircularNode()">By Value</button>
+            <button onclick="deleteCircularNodeAtStart()">At Start</button>
+            <button onclick="deleteCircularNodeAtEnd()">At End</button>
+        </div>
+    </div>
+    <div class="list-box" id="circularLinkedList"></div>
+    <div class="step" id="circularAlgorithmSteps"></div>
+    <div class="complexity" id="complexityInfo"></div>
+</div>
+
+<script>
+    let circularHead = null;
+    const circularLinkedListContainer = document.getElementById('circularLinkedList');
+
+    function showInsertOptions() {
+        document.getElementById('insertOptions').style.display = 'block';
+        document.getElementById('deleteOptions').style.display = 'none';
+    }
+
+    function showDeleteOptions() {
+        document.getElementById('deleteOptions').style.display = 'block';
+        document.getElementById('insertOptions').style.display = 'none';
+    }
+
+    function addCircularNodeAtEnd() {
+        const value = document.getElementById('nodeValue').value;
+        if (value === '') return;
+
+        const newNode = {
+            value: parseInt(value),
+            next: circularHead
+        };
+
+        if (!circularHead) {
+            circularHead = newNode;
+            newNode.next = circularHead; // Point to itself
+        } else {
+            let current = circularHead;
+            while (current.next !== circularHead) {
+                current = current.next;
+            }
+            current.next = newNode;
+            newNode.next = circularHead; // Maintain circularity
+        }
+
+        document.getElementById('nodeValue').value = '';
+        animateCircularList();
+    }
+
+    function addCircularNodeAtStart() {
+        const value = document.getElementById('nodeValue').value;
+        if (value === '') return;
+
+        const newNode = {
+            value: parseInt(value),
+            next: circularHead
+        };
+
+        if (!circularHead) {
+            circularHead = newNode;
+            newNode.next = circularHead; // Point to itself
+        } else {
+            let current = circularHead;
+            while (current.next !== circularHead) {
+                current = current.next;
+            }
+            current.next = newNode; // Last node points to new node
+            newNode.next = circularHead; // New node points to head
+            circularHead = newNode; // Update head
+        }
+
+        document.getElementById('nodeValue').value = '';
+        animateCircularList();
+    }
+
+    function addCircularNodeInBetween() {
+        const value = document.getElementById('nodeValue').value;
+        const position = parseInt(prompt("Enter position to insert (0 for start, 1 for 2nd, etc.):"));
+        if (value === '' || isNaN(position)) return;
+
+        const newNode = {
+            value: parseInt(value),
+            next: null
+        };
+
+        if (position === 0) {
+            addCircularNodeAtStart();
+            return;
+        }
+
+        let current = circularHead;
+        let count = 0;
+
+        while (current && count < position - 1) {
+            current = current.next;
+            count++;
+            if (current === circularHead) break; // Prevent infinite loop in circular list
+        }
+
+        if (current) {
+            newNode.next = current.next;
+            current.next = newNode;
+        } else {
+            alert("Position out of bounds");
+        }
+
+        document.getElementById('nodeValue').value = '';
+        animateCircularList();
+    }
+
+    function deleteCircularNode() {
+        const value = document.getElementById('nodeValue').value;
+        if (value === '') return;
+
+        let current = circularHead;
+        let prev = null;
+
+        if (current && current.value === parseInt(value)) {
+            // Handle deletion of head
+            if (current.next === circularHead) {
+                circularHead = null; // Only one node case
+            } else {
+                // Find last node to update its next pointer
+                while (current.next !== circularHead) {
+                    current = current.next;
+                }
+                current.next = circularHead.next; // Bypass head
+                circularHead = circularHead.next; // Update head
+            }
+            animateCircularList();
+            return;
+        }
+
+        prev = current;
+        current = current.next;
+
+        while (current !== circularHead && current.value !== parseInt(value)) {
+            prev = current;
+            current = current.next;
+        }
+
+        if (current !== circularHead) {
+            prev.next = current.next; // Bypass current node
+        }
+
+        document.getElementById('nodeValue').value = '';
+        animateCircularList();
+    }
+
+    function deleteCircularNodeAtStart() {
+        if (!circularHead) return;
+        deleteCircularNode(circularHead.value);
+    }
+
+    function deleteCircularNodeAtEnd() {
+        if (!circularHead) return;
+
+        let current = circularHead;
+        while (current.next !== circularHead) {
+            current = current.next;
+        }
+        current.next = circularHead.next; // Bypass head
+        circularHead = circularHead.next; // Update head
+        animateCircularList();
+    }
+
+    function searchNode() {
+        const value = document.getElementById('nodeValue').value;
+        if (value === '') return;
+
+        let current = circularHead;
+        let index = 0;
+
+        if (!current) {
+            alert("List is empty");
+            return;
+        }
+
+        do {
+            if (current.value === parseInt(value)) {
+                highlightNode(current.value);
+                alert(`Node ${current.value} found at index ${index}`);
+                return;
+            }
+            current = current.next;
+            index++;
+        } while (current !== circularHead);
+
+        alert(`Node ${value} not found`);
+    }
+
+    function highlightNode(value) {
+        const nodes = circularLinkedListContainer.children;
+        for (let node of nodes) {
+            if (node.innerText == value) {
+                node.classList.add('selected');
+                setTimeout(() => {
+                    node.classList.remove('selected');
+                }, 1000); // Highlight for 1 second
+            }
+        }
+    }
+
+    function animateCircularList() {
+        circularLinkedListContainer.innerHTML = '';
+        let current = circularHead;
+
+        if (!current) {
+            return; // No need to show anything if the list is empty
+        }
+
+        const numNodes = countNodes();
+        let prevNodeElement = null;
+        let prevAngle = 0;
+
+        do {
+            const nodeElement = document.createElement('div');
+            nodeElement.classList.add('node');
+            nodeElement.innerText = current.value;
+
+            // Calculate position for circular layout
+            const angle = (2 * Math.PI / numNodes) * (current.value % numNodes);
+            const x = 75 + 75 * Math.cos(angle); // Adjust radius to fit
+            const y = 75 + 75 * Math.sin(angle); // Adjust radius to fit
+            nodeElement.style.left = `${x}px`;
+            nodeElement.style.top = `${y}px`;
+
+            circularLinkedListContainer.appendChild(nodeElement);
+
+            // Create arrows to next node
+            if (prevNodeElement) {
+                const arrowElement = document.createElement('div');
+                arrowElement.classList.add('arrow');
+
+                const arrowX = (75 + 75 * Math.cos(prevAngle + (Math.PI / numNodes))) + 15;
+                const arrowY = (75 + 75 * Math.sin(prevAngle + (Math.PI / numNodes))) + 15;
+                arrowElement.style.left = `${arrowX}px`;
+                arrowElement.style.top = `${arrowY}px`;
+                circularLinkedListContainer.appendChild(arrowElement);
+
+                const reverseArrowElement = document.createElement('div');
+                reverseArrowElement.classList.add('arrow');
+
+                const reverseArrowX = (75 + 75 * Math.cos(angle - (Math.PI / numNodes))) + 15;
+                const reverseArrowY = (75 + 75 * Math.sin(angle - (Math.PI / numNodes))) + 15;
+                reverseArrowElement.style.left = `${reverseArrowX}px`;
+                reverseArrowElement.style.top = `${reverseArrowY}px`;
+                circularLinkedListContainer.appendChild(reverseArrowElement);
+            }
+
+            prevNodeElement = nodeElement;
+            prevAngle = angle;
+            current = current.next;
+        } while (current !== circularHead);
+
+        displayComplexity();
+    }
+
+    function countNodes() {
+        let count = 0;
+        let current = circularHead;
+
+        if (!current) return count;
+
+        do {
+            count++;
+            current = current.next;
+        } while (current !== circularHead);
+
+        return count;
+    }
+
+    function displayComplexity() {
+        const complexityInfo = document.getElementById('complexityInfo');
+        complexityInfo.innerHTML = `
+            <p>Time Complexity:</p>
+            <ul>
+                <li>Search: O(n)</li>
+                <li>Insert: O(n) for insertion at a specific position, O(1) at start/end</li>
+                <li>Delete: O(n) for deletion by value, O(1) at start/end</li>
+            </ul>
+            <p>Space Complexity: O(n)</p>
+        `;
+    }
+</script>
+</body>
+</html>

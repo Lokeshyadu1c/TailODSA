@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recursive Sorting Animation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, white, rgb(78, 28, 28));
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Ensures footer stays at the bottom */
+        }
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #d62e2e;
+        }
+        img {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+        }
+        footer {
+            background: linear-gradient(to right, #8f0303, #410e70);
+            padding: 10px;
+            text-align: center;
+            margin-top: auto; /* Push footer to the bottom */
+        }
+        footer a {
+            margin: 0 15px;
+            color: white;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+        .input-container {
+            margin: 20px 0;
+        }
+        input[type="text"] {
+            padding: 10px;
+            border: 2px solid #d62e2e;
+            border-radius: 5px;
+            outline: none;
+            width: 300px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #d62e2e;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .array-container {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            position: relative;
+        }
+        .array-item {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid black;
+            margin: 5px;
+            position: relative;
+            transition: transform 0.3s, background-color 0.3s;
+        }
+        .pivot {
+            background-color: lightpink;
+        }
+        .swapping {
+            background-color: yellow;
+        }
+        .iterating {
+            background-color: lightblue;
+        }
+        .status-block {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 60px; /* Adjust based on header height */
+            right: 20px;
+            width: 200px;
+            background-color: white;
+            border: 1px solid #d62e2e;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .pivot-label {
+            background-color: lightpink;
+            padding: 5px;
+            margin-bottom: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .swapped-label {
+            background-color: yellow;
+            padding: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .swap-reason {
+            font-size: 12px;
+            color: #333;
+            text-align: center;
+        }
+        .result-box {
+            display: none;
+            margin-top: 20px;
+            padding: 10px;
+            border: 2px solid #d62e2e;
+            background-color: #fff3cd;
+        }
+        .pivot-block {
+            position: absolute;
+            background-color: lightpink;
+            padding: 5px;
+            border: 1px solid #d62e2e;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            width: 50px;
+            top: -30px; /* Position above the pivot */
+            left: 0; /* Center it above the pivot */
+            transform: translateX(50%);
+        }
+        .current-subarray {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            border: 2px solid #d62e2e;
+            padding: 10px;
+        }
+        .current-subarray .array-item {
+            background-color: #f2f2f2;
+        }
+        .pivot-index {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #d62e2e;
+            color: white;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        .recursive-call {
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- header -->
+    <header>
+        <div class="icon" id="icon">
+            <img src="C:/Users/Khyati Pahwa/Downloads/dsa.jfif" alt="Website Icon">
+        </div>
+        <div id="roadmap" class="roadmap">
+            <img src="C:/Users/Khyati Pahwa/Downloads/roadmap.png" alt="Roadmap">
+        </div>
+        <div class="home" id="home">
+            <img class="home-icon" src="c:/Users/Khyati Pahwa/Downloads/home.png" alt="home">
+        </div>
+    </header>
+
+    <!-- Status Block -->
+    <div class="status-block" id="statusBlock">
+        <div class="pivot-label" id="pivotLabel">Pivot</div>
+        <div class="swapped-label" id="swappedLabel">Swapped</div>
+        <div class="swap-reason" id="swapReason">Condition: Element is less than pivot</div>
+    </div>
+
+    <!-- Input and sort functionality -->
+    <div class="input-container">
+        <input type="text" id="numberInput" placeholder="Enter up to 25 numbers (comma separated)">
+        <button onclick="createArray()">Create Array</button>
+    </div>
+    <div class="input-container">
+        <button onclick="quickSort()">Sort with Quick Sort</button>
+    </div>
+
+    <!-- Array display -->
+    <div class="array-container" id="arrayContainer"></div>
+    <div class="current-subarray" id="currentSubarray"></div>
+    <div class="result-box" id="resultBox"></div>
+
+    <!-- footer -->
+    <footer>
+        <a href="#">About</a>
+        <a href="#">Team</a>
+        <a href="#">Terms of use</a>
+        <a href="#">Privacy policy</a>
+    </footer>
+
+    <script>
+        let arr = [];
+        let swapCount = 0;
+
+        function createArray() {
+            const input = document.getElementById('numberInput').value;
+            arr = input.split(',').map(num => num.trim()).slice(0, 25).map(Number);
+            displayArray();
+        }
+
+        function displayArray() {
+            const container = document.getElementById('arrayContainer');
+            container.innerHTML = '';
+            arr.forEach((num) => {
+                const item = document.createElement('div');
+                item.classList.add('array-item');
+                item.innerText = num;
+                container.appendChild(item);
+            });
+        }
+
+        function displayCurrentSubarray(low, high, level = 0) {
+            const subarrayContainer = document.getElementById('currentSubarray');
+            subarrayContainer.innerHTML = '';
+
+            const recursiveCallContainer = document.createElement('div');
+            recursiveCallContainer.className = 'recursive-call';
+            recursiveCallContainer.style.marginLeft = `${level * 20}px`;
+
+            for (let i = low; i <= high; i++) {
+                const item = document.createElement('div');
+                item.classList.add('array-item');
+                item.innerText = arr[i];
+                recursiveCallContainer.appendChild(item);
+
+                if (i === high) {
+                    const pivotIndex = document.createElement('div');
+                    pivotIndex.className = 'pivot-index';
+                    pivotIndex.innerText = `Pivot: ${i}`;
+                    item.appendChild(pivotIndex);
+                }
+            }
+
+            subarrayContainer.appendChild(recursiveCallContainer);
+        }
+
+        async function quickSort() {
+            const resultBox = document.getElementById('resultBox');
+            resultBox.style.display = 'none';
+            swapCount = 0;
+
+            // Clear the current subarray display
+            const subarrayContainer = document.getElementById('currentSubarray');
+            subarrayContainer.innerHTML = '';
+
+            await sort(arr, 0, arr.length - 1);
+            resultBox.innerHTML = `Sorted Array: ${arr.join(', ')}<br>Number of Swaps: ${swapCount}<br>Time Complexity: O(n log n)<br>Space Complexity: O(log n)`;
+            resultBox.style.display = 'block';
+        }
+
+        async function sort(array, low, high, level = 0) {
+            if (low < high) {
+                const pivotIndex = await partition(array, low, high, level);
+
+                // Highlight the current subarray being sorted
+                displayCurrentSubarray(low, pivotIndex - 1, level);
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second
+
+                displayCurrentSubarray(pivotIndex + 1, high, level);
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second
+
+                await sort(array, low, pivotIndex - 1, level + 1);
+                await sort(array, pivotIndex + 1, high, level + 1);
+            }
+        }
+
+        async function partition(array, low, high, level) {
+            const pivot = array[high]; // Choosing the last element as pivot
+            const pivotItem = document.querySelector(`.array-item:nth-child(${high + 1})`);
+            pivotItem.classList.add('pivot');
+
+            // Create and position pivot block
+            const pivotBlock = document.createElement('div');
+            pivotBlock.className = 'pivot-block';
+            pivotBlock.innerText = `Pivot: ${pivot}`;
+            pivotItem.appendChild(pivotBlock);
+
+            // Update status block
+            document.getElementById('pivotLabel').innerText = `Pivot: ${pivot}`;
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second
+
+            let i = low - 1;
+
+            for (let j = low; j < high; j++) {
+                const currentItem = document.querySelector(`.array-item:nth-child(${j + 1})`);
+                currentItem.classList.add('iterating');
+                await new Promise(resolve => setTimeout(resolve, 500)); // Wait for 0.5 seconds
+
+                if (array[j] < pivot) {
+                    i++;
+                    swapCount++;
+                    [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+                    displayArray();
+
+                    const swapItem1 = document.querySelector(`.array-item:nth-child(${i + 1})`);
+                    const swapItem2 = document.querySelector(`.array-item:nth-child(${j + 1})`);
+
+                    swapItem1.classList.add('swapping');
+                    swapItem2.classList.add('swapping');
+
+                    // Update status block
+                    document.getElementById('swappedLabel').innerText = `Swapped: ${array[i]} and ${array[j]}`;
+                    document.getElementById('swapReason').innerText = `Condition: ${array[j]} < ${pivot}`;
+
+                    await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second
+
+                    swapItem1.classList.remove('swapping');
+                    swapItem2.classList.remove('swapping');
+                }
+                currentItem.classList.remove('iterating'); // Remove iterating class
+            }
+
+            // Swap the pivot element
+            [array[i + 1], array[high]] = [array[high], array[i + 1]];
+            displayArray();
+
+            pivotItem.classList.remove('pivot'); // Remove pivot class
+            pivotBlock.remove(); // Remove the pivot block
+            return i + 1; // Return the pivot index
+        }
+    </script>
+</body>
+</html>

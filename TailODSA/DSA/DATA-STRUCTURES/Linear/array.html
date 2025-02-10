@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Array Animation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #8f7c7c;
+            padding: 20px;
+        }
+        input[type="text"], input[type="number"] {
+            margin: 5px;
+            padding: 10px;
+            width: 200px;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        .array-block {
+            display: inline-block;
+            padding: 10px;
+            margin: 5px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            transition: transform 0.5s;
+        }
+        .enlarge {
+            transform: scale(1.5);
+        }
+        #controls {
+            display: none;
+        }
+        #resultBox {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #007bff;
+            background-color: #e7f1ff;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Array Animation</h1>
+    <input type="text" id="initialInput" placeholder="Enter comma-separated values">
+    <button onclick="createArray()">Create Array</button>
+    <div id="controls">
+        <input type="text" id="userInput" placeholder="Enter a value">
+        <input type="number" id="indexInput" placeholder="Index (for add/delete)">
+        <button onclick="addElement()">Add</button>
+        <button onclick="deleteElement()">Delete</button>
+        <button onclick="searchElement()">Search</button>
+    </div>
+    <div id="arrayDisplay"></div>
+    <div id="resultBox"></div>
+
+    <script>
+        let array = [];
+
+        function createArray() {
+            const input = document.getElementById('initialInput').value;
+            array = input.split(',').map(item => item.trim()).filter(item => item);
+            updateDisplay();
+            document.getElementById('controls').style.display = 'block';
+            clearInitialInput();
+        }
+
+        function updateDisplay() {
+            const display = document.getElementById('arrayDisplay');
+            display.innerHTML = '';
+            array.forEach((value, index) => {
+                const block = document.createElement('div');
+                block.className = 'array-block';
+                block.innerText = value;
+                block.onclick = () => highlightBlock(index);
+                display.appendChild(block);
+            });
+        }
+
+        function addElement() {
+            const value = document.getElementById('userInput').value;
+            const index = parseInt(document.getElementById('indexInput').value);
+            if (!isNaN(index) && index >= 0 && index <= array.length) {
+                array.splice(index, 0, value);
+                updateDisplay();
+            } else {
+                alert('Invalid index');
+            }
+            clearInputs();
+        }
+
+        function deleteElement() {
+            const index = parseInt(document.getElementById('indexInput').value);
+            if (!isNaN(index) && index >= 0 && index < array.length) {
+                array.splice(index, 1);
+                updateDisplay();
+            } else {
+                alert('Invalid index');
+            }
+            clearInputs();
+        }
+
+        async function searchElement() {
+            const value = document.getElementById('userInput').value;
+            const resultBox = document.getElementById('resultBox');
+            resultBox.style.display = 'none'; // Hide result box initially
+            for (let i = 0; i < array.length; i++) {
+                highlightBlock(i);
+                await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for 2 seconds
+                if (array[i] === value) {
+                    displayResult(i);
+                    return;
+                }
+            }
+            displayResult(-1); // Not found
+        }
+
+        function highlightBlock(index) {
+            const blocks = document.getElementsByClassName('array-block');
+            for (let i = 0; i < blocks.length; i++) {
+                blocks[i].classList.remove('enlarge');
+            }
+            if (blocks[index]) {
+                blocks[index].classList.add('enlarge');
+                setTimeout(() => {
+                    blocks[index].classList.remove('enlarge');
+                }, 1000);
+            }
+        }
+
+        function displayResult(index) {
+            const resultBox = document.getElementById('resultBox');
+            resultBox.innerHTML = '';
+            if (index !== -1) {
+                resultBox.innerHTML = `Element found at index: ${index}<br>Time Complexity: O(n)<br>Space Complexity: O(1)`;
+            } else {
+                resultBox.innerHTML = `Element not found.<br>Time Complexity: O(n)<br>Space Complexity: O(1)`;
+            }
+            resultBox.style.display = 'block';
+        }
+
+        function clearInputs() {
+            document.getElementById('userInput').value = '';
+            document.getElementById('indexInput').value = '';
+        }
+
+        function clearInitialInput() {
+            document.getElementById('initialInput').value = '';
+        }
+    </script>
+</body>
+</html>

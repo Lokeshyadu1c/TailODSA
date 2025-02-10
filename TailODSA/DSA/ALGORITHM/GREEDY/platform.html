@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greedy Algorithm - Minimum Number of Platforms with Train Animation</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+            background: linear-gradient(to right, #ffefba, #ffffff);
+        }
+
+        #problemStatement {
+            width: 50%;
+            padding: 20px;
+            border-right: 2px solid #333;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        #animationContainer {
+            width: 50%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+
+        .platform {
+            position: absolute;
+            bottom: 0;
+            height: 20px;
+            background-color: #4CAF50; /* Green color */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            border-radius: 5px;
+            z-index: 1;
+        }
+
+        .train {
+            position: absolute;
+            bottom: 30px; /* Adjust for train height */
+            width: 30px;
+            height: 10px;
+            border-radius: 5px;
+            transition: all 0.5s ease;
+            z-index: 2;
+        }
+
+        #inputContainer {
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        input {
+            margin: 5px;
+            padding: 10px;
+            width: 200px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div id="problemStatement">
+        <h1>Minimum Number of Platforms Problem</h1>
+        <p><strong>Problem Statement:</strong></p>
+        <p>Given arrival and departure times of trains at a railway station, you need to find the minimum number of platforms required to accommodate all trains at the station simultaneously without any train waiting.</p>
+        
+        <p><strong>Input:</strong></p>
+        <p>Arrival Times: An array of integers representing the arrival times of trains.</p>
+        <p>Departure Times: An array of integers representing the departure times of trains.</p>
+        
+        <p><strong>Constraints:</strong></p>
+        <ul>
+            <li>Number of Trains (n): 1 ≤ n ≤ 10<sup>5</sup></li>
+            <li>Arrival and Departure Times: Each arrival and departure time is a non-negative integer.</li>
+            <li>Arrival and departure times are in a 24-hour format (0 to 23 for hours, 0 to 59 for minutes).</li>
+            <li>Arrival time of a train will always be less than its departure time.</li>
+            <li>No Overlapping: Trains can arrive and depart at the same time, but this does not increase the number of platforms needed.</li>
+        </ul>
+    </div>
+    <div id="animationContainer">
+        <div id="inputContainer">
+            <input type="text" id="arrivalInput" placeholder="Arrival times (comma-separated)">
+            <input type="text" id="departureInput" placeholder="Departure times (comma-separated)">
+            <button onclick="startAnimation()">Start Animation</button>
+            <button onclick="resetAnimation()">Reset</button>
+        </div>
+        <div id="animationArea"></div>
+    </div>
+
+    <script>
+        const colors = ['#FF5733', '#33FF57', '#3357FF', '#F1C40F', '#8E44AD', '#E74C3C', '#3498DB', '#2ECC71'];
+        let platforms = [];
+        const animationArea = document.getElementById('animationArea');
+        const object = document.createElement('div');
+        object.className = 'object';
+        animationArea.appendChild(object);
+
+        function createPlatforms(numPlatforms) {
+            for (let i = 0; i < numPlatforms; i++) {
+                const platform = document.createElement('div');
+                platform.className = 'platform';
+                platform.style.width = '100px';
+                platform.style.left = `${50 + i * 100}px`;
+                platform.innerText = `Platform ${i + 1}`;
+                animationArea.appendChild(platform);
+            }
+        }
+
+        function createTrain(arrivalTime, departureTime, platformIndex) {
+            const train = document.createElement('div');
+            train.className = 'train';
+            train.style.backgroundColor = colors[platformIndex % colors.length];
+            train.style.left = `${50 + platformIndex * 100 + 35}px`; // Center the train on the platform
+            train.innerText = `Arr: ${arrivalTime}, Dep: ${departureTime}`;
+            animationArea.appendChild(train);
+            return train;
+        }
+
+        function startAnimation() {
+            const arrivalTimes = document.getElementById('arrivalInput').value.split(',').map(Number);
+            const departureTimes = document.getElementById('departureInput').value.split(',').map(Number);
+
+            if (arrivalTimes.length !== departureTimes.length) {
+                alert("Arrival and Departure times must have the same length.");
+                return;
+            }
+
+            platforms = [];
+            let currentIndex = 0;
+            let platformCount = 0;
+
+            const events = [];
+
+            arrivalTimes.forEach((time, index) => {
+                events.push({ time, type: 'arrival', index });
+            });
+            departureTimes.forEach((time, index) => {
+                events.push({ time, type: 'departure', index });
+            });
+
+            events.sort((a, b) => a.time - b.time || (a.type === 'arrival' ? -1 : 1));
+
+            const interval = setInterval(() => {
+                if (currentIndex < events.length) {
+                    const event = events[currentIndex];
+                    if (event.type === 'arrival') {
+                        if (platformCount === 0 || departureTimes[event.index] > arrivalTimes[currentIndex]) {
+                            platformCount++;
+                            createPlatforms(platformCount);
+                        }
+                        const train = createTrain(arrivalTimes[event.index], departureTimes[event.index], platformCount - 1);
+                        train.style.bottom = `${platformCount * 20}px`; // Stack trains on platforms
+                    } else {
+                        platformCount--;
+                        const departingTrain = document.querySelector(`.train:nth-child(${event.index + 1})`);
+                        if (departingTrain) {
+                            departingTrain.remove();
+                        }
+                    }
+                    currentIndex++;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 1000);
+        }
+
+        function resetAnimation() {
+            const trainElements = document.querySelectorAll('.train');
+            trainElements.forEach(train => train.remove());
+            const platformElements = document.querySelectorAll('.platform');
+            platformElements.forEach(platform => platform.remove());
+            platforms = [];
+        }
+    </script>
+</body>
+</html>

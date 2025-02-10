@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Searching Algorithm Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, white, rgb(78, 28, 28));
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Ensures footer stays at the bottom */
+        }
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #d62e2e;
+        }
+        img {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+        }
+        .roadmap {
+            margin-left: 15px;
+            width: 50px;
+            height: auto;
+        }
+        footer {
+            background: linear-gradient(to right, #8f0303, #410e70);
+            padding: 10px;
+            text-align: center;
+            margin-top: auto; /* Push footer to the bottom */
+        }
+        footer a {
+            margin: 0 15px;
+            color: white;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+        .input-container {
+            margin: 20px 0;
+        }
+        input[type="text"] {
+            padding: 10px;
+            border: 2px solid #d62e2e;
+            border-radius: 5px;
+            outline: none;
+            width: 300px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #d62e2e;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .array-container {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            position: relative;
+        }
+        .array-item {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid black;
+            margin: 5px;
+            position: relative;
+            transition: transform 0.3s, background-color 0.3s;
+        }
+        .array-item.small {
+            font-size: 10px;
+        }
+        .searching {
+            background-color: yellow;
+            transform: scale(1.2);
+        }
+        .found {
+            background-color: green;
+            color: white;
+        }
+        .mid-box {
+            position: absolute;
+            background-color: rgba(255, 255, 0, 0.5);
+            border: 2px solid #d62e2e;
+            padding: 5px;
+            font-weight: bold;
+            text-align: center;
+            width: 60px;
+            top: -30px; /* Adjust this value to position the box above the mid element */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+        .result-box {
+            display: none;
+            margin-top: 20px;
+            padding: 10px;
+            border: 2px solid #d62e2e;
+            background-color: #fff3cd;
+        }
+    </style>
+</head>
+<body>
+    <!-- header -->
+    <header>
+        <div class="icon" id="icon">
+            <img src="C:/Users/Khyati Pahwa/Downloads/dsa.jfif" alt="Website Icon">
+        </div>
+        <div id="roadmap" class="roadmap">
+            <img src="C:/Users/Khyati Pahwa/Downloads/roadmap.png" alt="Roadmap">
+        </div>
+        <div class="home" id="home">
+            <img class="home-icon" src="c:/Users/Khyati Pahwa/Downloads/home.png" alt="home">
+        </div>
+    </header>
+
+    <!-- Input and search functionality -->
+    <div class="input-container">
+        <input type="text" id="numberInput" placeholder="Enter up to 25 numbers (comma separated)">
+        <button onclick="createArray()">Create Array</button>
+    </div>
+    <div class="input-container">
+        <input type="text" id="searchInput" placeholder="Enter number to find">
+        <button onclick="binarySearch()">Search</button>
+    </div>
+
+    <!-- Array display -->
+    <div class="array-container" id="arrayContainer"></div>
+    <div class="result-box" id="resultBox"></div>
+
+    <!-- footer -->
+    <footer>
+        <a href="#">About</a>
+        <a href="#">Team</a>
+        <a href="#">Terms of use</a>
+        <a href="#">Privacy policy</a>
+    </footer>
+
+    <script>
+        let arr = [];
+
+        function createArray() {
+            const input = document.getElementById('numberInput').value;
+            arr = input.split(',').map(num => num.trim()).slice(0, 25).map(Number).sort((a, b) => a - b);
+            displayArray();
+        }
+
+        function displayArray() {
+            const container = document.getElementById('arrayContainer');
+            container.innerHTML = '';
+            arr.forEach((num) => {
+                const item = document.createElement('div');
+                item.classList.add('array-item', 'small');
+                item.innerText = num;
+                container.appendChild(item);
+            });
+        }
+
+        async function binarySearch() {
+            const key = Number(document.getElementById('searchInput').value);
+            const resultBox = document.getElementById('resultBox');
+            resultBox.style.display = 'none';
+
+            let left = 0;
+            let right = arr.length - 1;
+            let foundIndex = -1;
+            let iterations = 0;
+
+            while (left <= right) {
+                const mid = Math.floor((left + right) / 2);
+                const item = document.querySelector(`.array-item:nth-child(${mid + 1})`);
+                item.classList.add('searching');
+
+                // Create mid box
+                const midBox = document.createElement('div');
+                midBox.classList.add('mid-box');
+                midBox.innerText = `Mid: ${arr[mid]}`;
+                item.appendChild(midBox);
+
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second
+
+                iterations++;
+
+                if (arr[mid] === key) {
+                    foundIndex = mid;
+                    item.classList.add('found');
+                    resultBox.innerHTML = `Key: ${key} found at index ${mid}!<br>Iterations: ${iterations}<br>Time Complexity: O(log n)<br>Space Complexity: O(1)`;
+                    resultBox.style.display = 'block';
+                    return;
+                } else if (arr[mid] < key) {
+                    left = mid + 1;
+                } else {
+                    right = mid - 1;
+                }
+
+                item.classList.remove('searching');
+                item.removeChild(midBox); // Remove mid box after checking
+            }
+
+            resultBox.innerHTML = `Key: ${key} not found.<br>Iterations: ${iterations}<br>Time Complexity: O(log n)<br>Space Complexity: O(1)`;
+            resultBox.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backtracking Overview</title>
+    <style>
+        /* General Styling */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, rgb(220, 230, 35), rgb(56, 206, 61));
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #d62e2e;
+        }
+
+        img {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .search-container {
+            display: flex;
+            align-items: center;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+            width: 250px;
+        }
+
+        .search-icon {
+            width: 20px;
+            height: 20px;
+            margin-left: 5px;
+        }
+
+        .roadmap {
+            margin-left: 15px;
+            width: 50px;
+            height: auto;
+        }
+
+        #main {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .flex-container {
+            display: flex;
+            flex-direction: column;
+            margin: 20px;
+            padding: 20px;
+            background-color: white;
+            border: 2px solid black;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 1200px; /* Limit maximum width */
+        }
+
+        .flex-box {
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 2px solid black;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .box {
+            padding: 30px; /* Larger padding for nested boxes */
+            background-color: #ffffff;
+            border: 3px solid black;
+            border-radius: 5px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* More prominent shadow */
+            width: 95%; /* Larger nested box */
+            margin: 10px auto;
+        }
+
+        .side-by-side {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        footer {
+            background: linear-gradient(to right, #8f0303, #410e70);
+            padding: 10px;
+            text-align: center;
+        }
+
+        footer a {
+            margin: 0 15px;
+            color: white;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-container {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            input[type="text"] {
+                width: 100%;
+            }
+
+            .roadmap, .home-icon {
+                margin: 10px 0;
+            }
+
+            .flex-container {
+                width: 100%;
+            }
+
+            .flex-box {
+                padding: 15px;
+            }
+
+            .box {
+                padding: 20px;
+                width: 100%; /* Full width in smaller screens */
+            }
+
+            .side-by-side {
+                flex-direction: column; /* Stack on small screens */
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                align-items: center;
+            }
+
+            .search-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            input[type="text"] {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .search-icon {
+                margin: 0 auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- header -->
+    <header>
+        <div class="icon" id="icon">
+            <img src="C:/Users/Khyati Pahwa/Downloads/dsa.jfif" alt="Website Icon">
+        </div>
+        <div id="roadmap" class="roadmap">
+            <img src="C:/Users/Khyati Pahwa/Downloads/roadmap.png" alt="Roadmap">
+        </div>
+        <div class="home" id="home">
+            <img class="home-icon" src="c:/Users/Khyati Pahwa/Downloads/home.png" alt="home">
+        </div>
+    </header>
+
+    <!-- main content -->
+    <div id="main">
+        <div class="flex-container">
+            <div class="box">
+                <h2>What are Searching Algorithms?</h2>
+                <p>Searching algorithms are methods for finding an item with specified properties within a collection of items. They are fundamental in computer science for locating data efficiently.</p>
+            </div>
+            <div class="side-by-side">
+                <div class="box">
+                    <h2>Types of Searching Algorithms</h2>
+                    <p>1. Linear Search<br>2. Binary Search<br>3. Depth-First Search (DFS)<br>4. Breadth-First Search (BFS)</p>
+                </div>
+                <div class="box">
+                    <h2>Definition</h2>
+                    <p>A searching algorithm is a procedure used to locate a specific item within a data structure.</p>
+                </div>
+            </div>
+            <div class="box">
+                <h2>Advantages and Disadvantages</h2>
+                <p>Advantages: Efficient data retrieval, easy implementation.<br>Disadvantages: Can be slow for large datasets, may require sorted data (for some algorithms).</p>
+            </div>
+            <div class="box">
+                <h2>Applications</h2>
+                <p>Used in databases, search engines, AI, and more for efficient data retrieval.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- footer -->
+    <footer>
+        <a href="#">About</a>
+        <a href="#">Team</a>
+        <a href="#">Terms of use</a>
+        <a href="#">Privacy policy</a>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insertion    Sort Visualization</title>
+    <style>
+        body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color:   
+ #f4f4f9;
+      flex-direction: column;
+    }
+
+    .input-container {
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+
+    input {
+      border-radius: 20px;
+      padding: 10px;
+      font-size: 16px;
+      width: 300px;
+    }
+
+    button {
+      border-radius: 5px 10px;
+      padding: 10px;
+      font-size: 16px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    .array-container {
+      border-radius: 30px;
+      border: 2px solid black;
+      width: 40%;
+      height: 400px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end; /* Maintain alignment at bottom */
+      margin-top: 20px;
+      margin-bottom: 10px;
+      /* Add some padding-bottom to create space for bars */
+      padding-bottom: 20px;
+    }
+
+    .bar {
+      width: 20px;
+      margin: 0 3px;
+      background-color: #3498db;
+      transition: height 0.3s ease-in-out;
+      position: relative;
+    }
+
+    .bar.highlight {
+      background-color: #e74c3c;
+    }
+
+    .bar.sorted {
+      background-color: #2ecc71;
+    }
+
+    .bar.moving {
+      background-color: #f39c12;
+    }
+
+    .bar-value {
+    position: absolute;
+   /* Increase the negative value to push the number further down */
+    left: 50%;
+    transform: translateX(-50%); /* Center the text */
+    font-size: 12px;
+    color: white;
+    text-align: center;
+}
+
+    </style>
+</head>
+<body>
+
+    <div class="input-container">
+        <label for="arrayInput">Enter Array (comma-separated values): </label>
+        <input type="text" id="arrayInput" placeholder="e.g. 5,3,8,4,2" />
+        <button onclick="startInsertionSort()">Start Insertion Sort</button>
+    </div>
+
+    <div class="array-container" id="arrayContainer"></div>
+
+    <script>
+        let array = [];
+        let steps = [];
+        let currentStep = 0;
+
+        function createBars(arr) {
+    const container = document.getElementById("arrayContainer");
+    container.innerHTML = "";
+
+    // Find the maximum value in the array
+    const maxValue = Math.max(...arr);
+    
+    // Calculate the scale factor based on the container height (400px)
+    const scaleFactor = 400 / maxValue;
+
+    arr.forEach((value, index) => {
+        const bar = document.createElement("div");
+        bar.classList.add("bar");
+
+        // Apply the scaled height
+        bar.style.height = `${value * scaleFactor}px`;
+
+        const valueElement = document.createElement("span");
+        valueElement.classList.add("bar-value");
+        valueElement.textContent = value;
+        bar.appendChild(valueElement);
+
+        container.appendChild(bar);
+    });
+}
+
+
+        function visualizeInsertionSort() {
+            let index = 0;
+            function nextStep() {
+                if (index < steps.length) {
+                    const step = steps[index];
+                    const bars = document.querySelectorAll(".bar");
+
+                    // Reset all bars' styles
+                    bars.forEach(bar => {
+                        bar.classList.remove("highlight");
+                        bar.classList.remove("sorted");
+                        bar.classList.remove("moving");
+                    });
+
+                    // Highlight the current value being moved
+                    step.highlight.forEach(i => {
+                        bars[i].classList.add("highlight");
+                    });
+
+                    // Mark the bars that are sorted
+                    step.sorted.forEach(i => {
+                        bars[i].classList.add("sorted");
+                    });
+
+                    // Mark the moving element
+                    step.moving.forEach(i => {
+                        bars[i].classList.add("moving");
+                    });
+
+                    index++;
+                    setTimeout(nextStep, 1000); // Move to the next step after 1 second
+                }
+            }
+            nextStep();
+        }
+
+        function startInsertionSort() {
+            const input = document.getElementById("arrayInput").value;
+            array = input.split(',').map(Number).filter(num => !isNaN(num));
+
+            if (array.length > 0) {
+                steps = [];
+                createBars(array);
+                insertionSort(array);
+                visualizeInsertionSort();
+            } else {
+                alert("Please enter a valid array.");
+            }
+        }
+
+        function insertionSort(arr) {
+            for (let i = 1; i < arr.length; i++) {
+                let currentValue = arr[i];
+                let j = i - 1;
+
+                let highlight = [i];
+                let sorted = [];
+                let moving = [i];
+
+                while (j >= 0 && arr[j] > currentValue) {
+                    arr[j + 1] = arr[j];
+                    j = j - 1;
+                    moving.push(j + 1);
+                }
+
+                arr[j + 1] = currentValue;
+                sorted = Array.from({ length: i + 1 }, (_, index) => index);
+
+                steps.push({ highlight, sorted, moving });
+                createBars(arr);
+            }
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .sudoku-container {
+            display: grid;
+            grid-template-columns: repeat(9, 50px);
+            grid-template-rows: repeat(9, 50px);
+            gap: 1px;
+            background-color: #333;
+            border: 3px solid #333;
+        }
+
+        .cell {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            outline: none;
+            background-color: #fff;
+        }
+
+        .cell:disabled {
+            background-color: #ddd;
+            color: #333;
+        }
+
+        .bold-border {
+            border-width: 3px;
+            border-style: solid;
+            border-color: #333;
+        }
+
+        .btn-container {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .btn.reset {
+            background-color: #f44336;
+        }
+
+        .btn.reset:hover {
+            background-color: #e53935;
+        }
+
+        .message {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sudoku Game</h1>
+    <div class="sudoku-container" id="sudoku-container"></div>
+    <div class="btn-container">
+        <button class="btn" id="check-solution">Check Solution</button>
+        <button class="btn reset" id="reset-game">Reset Game</button>
+    </div>
+    <div class="message" id="message"></div>
+
+    <script>
+        // Initial Sudoku puzzle (0 represents an empty cell)
+        const initialBoard = [
+            [5, 3, 0, 0, 7, 0, 0, 0, 0],
+            [6, 0, 0, 1, 9, 5, 0, 0, 0],
+            [0, 9, 8, 0, 0, 0, 0, 6, 0],
+            [8, 0, 0, 0, 6, 0, 0, 0, 3],
+            [4, 0, 0, 8, 0, 3, 0, 0, 1],
+            [7, 0, 0, 0, 2, 0, 0, 0, 6],
+            [0, 6, 0, 0, 0, 0, 2, 8, 0],
+            [0, 0, 0, 4, 1, 9, 0, 0, 5],
+            [0, 0, 0, 0, 8, 0, 0, 7, 9],
+        ];
+
+        const sudokuContainer = document.getElementById('sudoku-container');
+        const message = document.getElementById('message');
+
+        // Generate the Sudoku grid
+        function createSudokuBoard(board) {
+            sudokuContainer.innerHTML = ''; // Clear any existing grid
+            for (let row = 0; row < 9; row++) {
+                for (let col = 0; col < 9; col++) {
+                    const cell = document.createElement('input');
+                    cell.type = 'number';
+                    cell.min = 1;
+                    cell.max = 9;
+                    cell.classList.add('cell');
+
+                    // Pre-fill initial values
+                    if (board[row][col] !== 0) {
+                        cell.value = board[row][col];
+                        cell.disabled = true; // Disable editing for pre-filled cells
+                    }
+
+                    // Add bold borders for 3x3 subgrid separation
+                    if (row === 0 || row === 3 || row === 6) {
+                        cell.style.borderTop = '3px solid #333';
+                    }
+                    if (col === 0 || col === 3 || col === 6) {
+                        cell.style.borderLeft = '3px solid #333';
+                    }
+                    if (row === 8) {
+                        cell.style.borderBottom = '3px solid #333';
+                    }
+                    if (col === 8) {
+                        cell.style.borderRight = '3px solid #333';
+                    }
+
+                    sudokuContainer.appendChild(cell);
+                }
+            }
+        }
+
+        // Check if the Sudoku solution is valid
+        function isValidSudoku(board) {
+            function isValidGroup(group) {
+                const seen = new Set();
+                for (const num of group) {
+                    if (num === 0) return false; // Missing number
+                    if (seen.has(num)) return false; // Duplicate number
+                    seen.add(num);
+                }
+                return true;
+            }
+
+            // Check rows, columns, and 3x3 subgrids
+            for (let i = 0; i < 9; i++) {
+                const row = board[i];
+                const col = board.map(row => row[i]);
+                if (!isValidGroup(row) || !isValidGroup(col)) return false;
+            }
+
+            for (let r = 0; r < 9; r += 3) {
+                for (let c = 0; c < 9; c += 3) {
+                    const subgrid = [];
+                    for (let i = 0; i < 3; i++) {
+                        for (let j = 0; j < 3; j++) {
+                            subgrid.push(board[r + i][c + j]);
+                        }
+                    }
+                    if (!isValidGroup(subgrid)) return false;
+                }
+            }
+
+            return true;
+        }
+
+        // Get the current board state from the inputs
+        function getCurrentBoard() {
+            const cells = sudokuContainer.querySelectorAll('.cell');
+            const board = [];
+            for (let i = 0; i < 9; i++) {
+                const row = [];
+                for (let j = 0; j < 9; j++) {
+                    const value = cells[i * 9 + j].value;
+                    row.push(value ? parseInt(value, 10) : 0);
+                }
+                board.push(row);
+            }
+            return board;
+        }
+
+        // Event listener for checking the solution
+        document.getElementById('check-solution').addEventListener('click', () => {
+            const currentBoard = getCurrentBoard();
+            if (isValidSudoku(currentBoard)) {
+                message.textContent = 'Congratulations! The solution is correct!';
+                message.style.color = 'green';
+            } else {
+                message.textContent = 'The solution is incorrect. Try again!';
+                message.style.color = 'red';
+            }
+        });
+
+        // Event listener for resetting the game
+        document.getElementById('reset-game').addEventListener('click', () => {
+            createSudokuBoard(initialBoard);
+            message.textContent = '';
+        });
+
+        // Initialize the game
+        createSudokuBoard(initialBoard);
+    </script>
+</body>
+</html>

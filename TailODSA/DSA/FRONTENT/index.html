@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linked List Animation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .list {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .node {
+            width: 50px;
+            height: 50px;
+            background-color: #4CAF50;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 5px;
+            margin: 0 5px;
+            transition: all 0.5s ease;
+            position: relative;
+        }
+        .node.head {
+            background-color: #FF5722;
+        }
+        .arrow {
+            font-size: 24px;
+            margin: 0 5px;
+        }
+        input {
+            margin: 5px;
+        }
+        .step {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Linked List Animation</h1>
+<div>
+    <input type="number" id="nodeValue" placeholder="Enter node value" />
+    <button onclick="addNodeAtEnd()">Add Node at End</button>
+    <button onclick="addNodeAtStart()">Add Node at Start</button>
+    <input type="number" id="insertValue" placeholder="Insert after value" />
+    <button onclick="addNodeInBetween()">Add Node in Between</button>
+    <button onclick="reverseList()">Reverse List</button>
+    <input type="number" id="deleteValue" placeholder="Delete node value" />
+    <button onclick="deleteNode()">Delete Node</button>
+</div>
+<div class="list" id="linkedList"></div>
+<div class="step" id="algorithmSteps"></div>
+
+<script>
+    let head = null;
+    const linkedListContainer = document.getElementById('linkedList');
+    const algorithmStepsContainer = document.getElementById('algorithmSteps');
+
+    function addNodeAtEnd() {
+        const value = document.getElementById('nodeValue').value;
+        if (value === '') return;
+
+        const newNode = {
+            value: parseInt(value),
+            next: null
+        };
+
+        if (!head) {
+            head = newNode;
+        } else {
+            let current = head;
+            while (current.next) {
+                current = current.next;
+            }
+            current.next = newNode;
+        }
+
+        document.getElementById('nodeValue').value = '';
+        animateList();
+    }
+
+    function addNodeAtStart() {
+        const value = document.getElementById('nodeValue').value;
+        if (value === '') return;
+
+        const newNode = {
+            value: parseInt(value),
+            next: head
+        };
+        head = newNode;
+
+        document.getElementById('nodeValue').value = '';
+        animateList();
+    }
+
+    function addNodeInBetween() {
+        const insertValue = document.getElementById('insertValue').value;
+        const value = document.getElementById('nodeValue').value;
+        if (insertValue === '' || value === '') return;
+
+        const newNode = {
+            value: parseInt(value),
+            next: null
+        };
+
+        let current = head;
+        while (current && current.value !== parseInt(insertValue)) {
+            current = current.next;
+        }
+
+        if (current) {
+            newNode.next = current.next;
+            current.next = newNode;
+        }
+
+        document.getElementById('nodeValue').value = '';
+        document.getElementById('insertValue').value = '';
+        animateList();
+    }
+
+    function deleteNode() {
+        const value = document.getElementById('deleteValue').value;
+        if (value === '') return;
+
+        let current = head;
+        let prev = null;
+
+        while (current && current.value !== parseInt(value)) {
+            prev = current;
+            current = current.next;
+        }
+
+        if (current) {
+            if (prev) {
+                prev.next = current.next;
+            } else {
+                head = current.next; // Deleting the head
+            }
+        }
+
+        document.getElementById('deleteValue').value = '';
+        animateList();
+    }
+
+    async function reverseList() {
+        let prev = null;
+        let current = head;
+        let next = null;
+        const steps = [];
+
+        while (current) {
+            next = current.next; // Store next node
+            steps.push({ prev, curr: current, next }); // Store current state
+            current.next = prev; // Reverse current node's pointer
+            prev = current; // Move pointers one position ahead
+            current = next;
+        }
+        head = prev; // Update head to new front
+
+        // Display each step with a delay
+        for (let i = 0; i < steps.length; i++) {
+            const { prev, curr, next } = steps[i];
+            animateList(steps[i]); // Highlight nodes being swapped
+            algorithmStepsContainer.innerHTML = `Swapping: ${curr.value} with ${prev ? prev.value : 'null'}`;
+            await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for 2 seconds
+        }
+        algorithmStepsContainer.innerHTML = ''; // Clear steps after finishing
+        animateList(); // Final display
+    }
+
+    function animateList(step = null) {
+        linkedListContainer.innerHTML = '';
+        let current = head;
+
+        while (current) {
+            const nodeElement = document.createElement('div');
+            nodeElement.classList.add('node');
+            if (current === head) {
+                nodeElement.classList.add('head'); // Highlight the head node
+                nodeElement.innerText = 'head\n' + current.value;
+            } else {
+                nodeElement.innerText = current.value;
+            }
+
+            // Highlight the current node being processed
+            if (step && step.curr === current) {
+                nodeElement.style.backgroundColor = '#FF9800'; // Change color for the current node
+            }
+
+            linkedListContainer.appendChild(nodeElement);
+
+            if (current.next) {
+                const arrowElement = document.createElement('span');
+                arrowElement.classList.add('arrow');
+                arrowElement.innerText = '→';
+                linkedListContainer.appendChild(arrowElement);
+            }
+
+            current = current.next;
+        }
+    }
+</script>
+
+</body>
+</html>

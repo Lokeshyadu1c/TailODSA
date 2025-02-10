@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knapsack Problem Animation</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+            background: linear-gradient(to right, #ffefba, #ffffff);
+        }
+
+        #problemStatement {
+            width: 50%;
+            padding: 20px;
+            border-right: 2px solid #333;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        #animationContainer {
+            width: 50%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #animationArea {
+            position: relative;
+            width: 100%;
+            height: 60%;
+            border: 2px solid #333;
+            background-color: #e0e0e0;
+            overflow: hidden;
+        }
+
+        .item {
+            position: absolute;
+            bottom: 50px; /* Adjusted for item height above the bottom */
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            transition: all 0.5s ease;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .platform {
+            position: absolute;
+            bottom: 0;
+            height: 20px;
+            background-color: #4CAF50; /* Green color */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            border-radius: 5px;
+            z-index: 1;
+        }
+
+        #inputContainer {
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        input {
+            margin: 5px;
+            padding: 10px;
+            width: 200px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #maxProfitContainer {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #fff;
+            border: 2px solid #333;
+            border-radius: 5px;
+            width: 80%; /* Smaller width */
+            max-width: 300px; /* Max width for the container */
+            text-align: center; /* Center align text */
+        }
+
+        .profitItem {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px; /* Increased padding for larger boxes */
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            margin: 5px 0;
+            font-size: 16px; /* Larger font size */
+        }
+    </style>
+</head>
+<body>
+    <div id="problemStatement">
+        <h1>Knapsack Problem</h1>
+        <p><strong>Problem Statement:</strong></p>
+        <p>Given weights and values of items, you need to determine the maximum value that can be carried in a knapsack of a given capacity.</p>
+        
+        <p><strong>Input:</strong></p>
+        <p>Weights: An array of integers representing the weights of items.</p>
+        <p>Values: An array of integers representing the values of items.</p>
+        <p>Capacity: An integer representing the maximum weight capacity of the knapsack.</p>
+        
+        <p><strong>Constraints:</strong></p>
+        <ul>
+            <li>Number of Items (n): 1 ≤ n ≤ 100</li>
+            <li>Weights and Values: Each weight and value is a non-negative integer.</li>
+            <li>Capacity: 1 ≤ Capacity ≤ 1000</li>
+        </ul>
+    </div>
+    <div id="animationContainer">
+        <div id="inputContainer">
+            <input type="text" id="weightsInput" placeholder="Weights (comma-separated)">
+            <input type="text" id="valuesInput" placeholder="Values (comma-separated)">
+            <input type="number" id="capacityInput" placeholder="Capacity">
+            <button onclick="startAnimation()">Start Animation</button>
+            <button onclick="resetAnimation()">Reset</button>
+        </div>
+        <div id="animationArea"></div>
+        <div id="maxProfitContainer">
+            <h3>Selected Items</h3>
+            <div id="selectedItems"></div>
+        </div>
+    </div>
+
+    <script>
+        const colors = ['#FF5733', '#33FF57', '#3357FF', '#F1C40F', '#8E44AD', '#E74C3C', '#3498DB', '#2ECC71'];
+        const animationArea = document.getElementById('animationArea');
+        const selectedItemsContainer = document.getElementById('selectedItems');
+
+        function createPlatforms(numItems) {
+            for (let i = 0; i < numItems; i++) {
+                const platform = document.createElement('div');
+                platform.className = 'platform';
+                platform.style.width = '100px';
+                platform.style.left = `${50 + i * 120}px`;
+                platform.innerText = `Item ${i + 1}`;
+                animationArea.appendChild(platform);
+            }
+        }
+
+        function createItem(value, weight, index) {
+            const item = document.createElement('div');
+            item.className = 'item';
+            item.style.backgroundColor = colors[index % colors.length];
+            item.style.left = `${50 + index * 120 + 35}px`; // Center the item on the platform
+            item.innerText = `V:${value}, W:${weight}`;
+            animationArea.appendChild(item);
+            return item;
+        }
+
+        function displaySelectedItems(selectedItems) {
+            selectedItemsContainer.innerHTML = ''; // Clear previous items
+            selectedItems.forEach(item => {
+                const profitItem = document.createElement('div');
+                profitItem.className = 'profitItem';
+                profitItem.innerHTML = `Weight: ${item.weight}, Value: ${item.value}`;
+                selectedItemsContainer.appendChild(profitItem);
+            });
+        }
+
+        function startAnimation() {
+            const weights = document.getElementById('weightsInput').value.split(',').map(Number);
+            const values = document.getElementById('valuesInput').value.split(',').map(Number);
+            const capacity = Number(document.getElementById('capacityInput').value);
+
+            if (weights.length !== values.length) {
+                alert("Weights and Values must have the same length.");
+                return;
+            }
+
+            createPlatforms(weights.length);
+            const selectedItems = []; // To store selected items
+
+           //knapsack logic
+            let totalWeight = 0;
+            let totalValue = 0;
+
+            for (let i = 0; i < weights.length; i++) {
+                if (totalWeight + weights[i] <= capacity) {
+                    totalWeight += weights[i];
+                    totalValue += values[i];
+                    selectedItems.push({ weight: weights[i], value: values[i] });
+                    createItem(values[i], weights[i], i); 
+                }
+            }
+
+            console.log("Weights:", weights);
+            console.log("Values:", values);
+            console.log("Capacity:", capacity);
+            console.log("Total Weight:", totalWeight);
+            console.log("Total Value:", totalValue);
+
+            displaySelectedItems(selectedItems); // Display selected items
+        }
+
+        function resetAnimation() {
+            const itemElements = document.querySelectorAll('.item');
+            itemElements.forEach(item => item.remove());
+            const platformElements = document.querySelectorAll('.platform');
+            platformElements.forEach(platform => platform.remove());
+            selectedItemsContainer.innerHTML = ''; // Clear selected items
+        }
+    </script>
+</body>
+</html>
